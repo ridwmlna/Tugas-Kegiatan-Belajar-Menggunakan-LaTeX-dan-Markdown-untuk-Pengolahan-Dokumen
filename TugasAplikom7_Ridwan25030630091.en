@@ -1,0 +1,767 @@
+﻿% * Visualisasi dan Perhitungan Geometri dengan Euler Math Toolbox (EMT)
+% 
+% Nama  : Ridwan Maulana
+%% NIM   : 25030630091
+%% Kelas : Matematika F
+% 
+% Pada tugas pekan 11-12 ini saya menggambar dan menghitung objek-objek
+% geometri dengan Euler Math Toolbox (EMT). Objek yang dibahas dimulai
+% dari titik, garis, dan segitiga, kemudian lingkaran, parabola, elips,
+% dan hiperbola. Setiap bagian terdiri dari uraian teori, perintah EMT,
+% dan penjelasan hasilnya. Soal latihan dari dosen saya kerjakan
+% langsung pada bagian yang bersangkutan, sedangkan sembilan soal dari
+% buku Geometri ada pada bagian akhir.
+% 
+% ** Cara Penggunaan Notebook
+% 
+% Setiap baris perintah diawali tanda >, dan hasilnya muncul setelah
+% baris itu dijalankan dengan menekan ENTER. Angka atau titik pada
+% perintah dapat diubah untuk melihat pengaruhnya terhadap hasil.
+% Perintah plot yang diakhiri titik dua (:) menampilkan gambarnya tepat
+% di bawah perintah tersebut. Perintah yang memakai tanda & dihitung
+% oleh Maxima secara simbolik, dan tanda $ di depannya menampilkan hasil
+% dalam bentuk rumus.
+% 
+% Semua objek digambar pada bidang koordinat yang sama sampai bidang itu
+% diatur ulang dengan setPlotRange, sehingga urutan menjalankan perintah
+% berpengaruh. Jika gambar tampak janggal, perintah pada bagian tersebut
+% dijalankan ulang dari awal. Keluaran EMT memakai tanda titik sebagai
+% pemisah desimal, sedangkan penjelasan dalam teks memakai tanda koma.
+% 
+% ** Numerik dan Simbolik pada EMT
+% 
+% Seperti pada kalkulus, EMT memiliki dua cara menghitung. Cara numerik
+% menghasilkan bilangan desimal, sedangkan cara simbolik (melalui
+% Maxima) menghasilkan bentuk eksak seperti pecahan, akar, atau pi.
+%% - A=[1,0] menyimpan titik secara numerik, cocok untuk menggambar dan
+% menghitung dengan cepat.
+%% - A &= [1,0] menyimpan titik secara simbolik, sehingga hasilnya eksak
+% dan dapat diolah Maxima. Fungsi geometri yang sama dapat dipakai pada
+% kedua cara.
+% 
+% * 1. Memulai: geometry.e dan Bidang Koordinat
+% 
+% Fungsi-fungsi geometri EMT tersimpan dalam file geometry.e, sehingga
+% file ini harus dipanggil terlebih dahulu. Sesudah itu luas bidang
+% koordinat ditentukan dengan setPlotRange, karena semua objek
+% berikutnya digambar pada bidang yang sama.
+>load geometry
+Numerical and symbolic geometry.
+>setPlotRange(-0.5,2.5,-0.5,2.5);
+% Perintah setPlotRange(x1,x2,y1,y2) mengatur rentang sumbu x dan sumbu
+% y. Jika ditulis setPlotRange(r), rentangnya adalah -r sampai r pada
+% kedua sumbu.
+% 
+% Fungsi yang paling sering saya pakai:
+%% - plotPoint, plotSegment, plotLine, plotCircle: menggambar titik, ruas
+% garis, garis, dan lingkaran
+%% - lineThrough(A,B): garis melalui A dan B, disimpan sebagai [a,b,c]
+% untuk ax+by=c
+%% - perpendicular(A,g), parallel(A,g): garis melalui A yang tegak lurus
+% atau sejajar g
+%% - lineIntersection(g,h): titik potong dua garis
+%% - angleBisector(A,B,C): garis bagi sudut ABC (titik sudutnya B)
+%% - middlePerpendicular(A,B): garis sumbu ruas garis AB
+%% - circleThrough(A,B,C), circleWithCenter(P,r): lingkaran, disimpan
+% sebagai [x,y,r]
+%% - distance, areaTriangle, computeAngle: jarak, luas segitiga, dan
+% besar sudut
+% 
+% * 2. Titik, Garis, dan Segitiga
+% 
+% ** Teori singkat
+% 
+% Jarak antara titik A(x1,y1) dan B(x2,y2) adalah panjang ruas garis AB:
+% 
+% latex: d(A,B)=\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}
+% %image% TugasAplikom7_Ridwan25030630091-001.png
+% // latex: d(A,B)=\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}
+% 
+% Titik tengah ruas garis AB adalah rata-rata koordinat kedua ujungnya,
+% yaitu ((x1+x2)/2, (y1+y2)/2). Garis yang melalui A dan B mempunyai
+% persamaan ax+by=c dengan a=y1-y2, b=x2-x1, dan c=a*x1+b*y1. Perintah
+% lineThrough memakai bentuk ini.
+% 
+% Pada segitiga ABC terdapat beberapa garis istimewa:
+%% - Garis tinggi: garis dari titik sudut yang tegak lurus sisi di
+% hadapannya.
+%% - Garis berat: garis dari titik sudut ke titik tengah sisi di
+% hadapannya. Ketiga garis berat berpotongan di titik berat G=(A+B+C)/3,
+% dan G membagi setiap garis berat dengan perbandingan 2 : 1 dari titik
+% sudutnya.
+%% - Garis sumbu: garis yang tegak lurus sisi di titik tengahnya. Setiap
+% titik pada garis sumbu berjarak sama terhadap kedua ujung sisi.
+%% - Garis bagi sudut: garis yang membagi sudut menjadi dua bagian sama
+% besar. Luas segitiga sama dengan setengah alas kali tinggi, dan
+% kelilingnya adalah jumlah panjang ketiga sisi.
+% 
+% ** Contoh 1: segitiga ABC
+% 
+% Saya mengambil tiga titik A(1,0), B(0,1), dan C(2,2), lalu menggambar
+% titik dan sisi-sisinya.
+>A=[1,0]; B=[0,1]; C=[2,2];
+>plotPoint(A,"A"); plotPoint(B,"B"); plotPoint(C,"C");
+>plotSegment(A,B,"c"); plotSegment(B,C,"a"); plotSegment(A,C,"b");
+% Garis BC disimpan sebagai [a,b,c] yang berarti ax+by=c.
+>lineThrough(B,C)
+[-1,  2,  2]
+% Hasilnya [-1, 2, 2], yaitu -x+2y=2. Selanjutnya dicari garis tinggi dari
+% A, yaitu garis yang tegak lurus BC dan melalui A. Titik potongnya dengan
+% BC adalah D, yang disebut kaki tinggi.
+>h=perpendicular(A,lineThrough(B,C));
+>D=lineIntersection(h,lineThrough(B,C))
+[0.4,  1.2]
+% Hasilnya D=(0,4; 1,2). Opsi value=1 pada perintah berikut membuat EMT
+% menuliskan nilai koordinat titik D di samping titiknya.
+>plotPoint(D,value=1); aspect(1); plotSegment(A,D):
+ %image% TugasAplikom7_Ridwan25030630091-002.png
+% Luas segitiga kemudian dihitung dengan tiga cara, yaitu alas kali
+% tinggi dibagi dua, fungsi areaTriangle, dan jarak langsung.
+% 
+% latex: L_{\triangle ABC}=\frac12\cdot AD\cdot BC
+% %image% TugasAplikom7_Ridwan25030630091-003.png
+% // latex: L_{\triangle ABC}=\frac12\cdot AD\cdot BC
+>norm(A-D)*norm(B-C)/2
+1.5
+>areaTriangle(A,B,C)
+1.5
+>distance(A,D)*distance(B,C)/2
+1.5
+% Ketiga cara menghasilkan luas 1,5. Besar sudut di C dicetak dalam
+% derajat-menit-detik:
+>degprint(computeAngle(B,C,A))
+36°52'11.63''
+% Hasilnya 36Â°52'11,63", sesuai dengan cos C = 4/5. Nilai ini dapat
+% dicek dari hasil kali titik vektor CB dan CA, yaitu 4, dibagi hasil kali
+% panjangnya, yaitu 5.
+% Keliling segitiga adalah jumlah panjang ketiga sisinya:
+>distance(A,B)+distance(B,C)+distance(A,C)
+5.88634951737
+% Hasilnya 5,886, yaitu bentuk desimal dari akar 2 + 2 akar 5.
+% 
+% ** Titik tengah, garis berat, dan garis sumbu
+% 
+% Titik tengah ruas garis diperoleh dengan merata-ratakan koordinat kedua
+% ujungnya. Garis berat menghubungkan titik sudut dengan titik tengah sisi
+% di hadapannya, dan ketiganya berpotongan di titik berat.
+>M=(A+B)/2
+[0.5,  0.5]
+>mA=lineThrough(A,(B+C)/2); mB=lineThrough(B,(A+C)/2);
+>G=lineIntersection(mA,mB), (A+B+C)/3
+[1,  1]
+[1,  1]
+>color(3); plotLine(mA); plotLine(mB); color(1); plotPoint(G,"G"):
+ %image% TugasAplikom7_Ridwan25030630091-004.png
+% Titik G sama dengan (A+B+C)/3 = (1,1), sehingga dua garis berat sudah
+% cukup untuk menemukan titik berat. Perbandingan 2 : 1 dapat dicek dengan
+% membandingkan jarak A ke G dan jarak G ke titik tengah BC:
+>distance(A,G)/distance(G,(B+C)/2)
+2
+% Hasilnya 2, sesuai dengan teori. Garis sumbu AB dapat ditentukan
+% langsung dengan satu perintah:
+>gs=middlePerpendicular(A,B)
+[1,  -1,  0]
+% Hasilnya [1, -1, 0], yaitu garis y=x. Tanda koefisien boleh berlawanan
+% karena garisnya tetap sama. Titik C(2,2) terletak pada garis ini
+% karena CA = CB, sehingga segitiga ABC adalah segitiga sama kaki.
+% (Garis sumbu juga dapat dibuat dengan dua lingkaran, lihat bagian 3.)
+% 
+% * 3. Lingkaran
+% 
+% ** Teori singkat
+% 
+% Lingkaran dengan pusat (p,q) dan jari-jari r mempunyai persamaan
+% 
+% latex: (x-p)^2+(y-q)^2=r^2
+% %image% TugasAplikom7_Ridwan25030630091-005.png
+% // latex: (x-p)^2+(y-q)^2=r^2
+% 
+% Lingkaran luar segitiga adalah lingkaran yang melalui ketiga titik
+% sudutnya. Pusatnya adalah titik potong ketiga garis sumbu sisi, dan
+% jari-jarinya R=abc/(4L) dengan L luas segitiga. Lingkaran dalam adalah
+% lingkaran yang menyinggung ketiga sisi. Pusatnya adalah titik potong
+% ketiga garis bagi sudut, dan jari-jarinya r=L/s dengan s setengah
+% keliling segitiga. Keliling lingkaran adalah 2*pi*r dan luasnya
+% pi*r^2.
+% 
+% ** Lingkaran luar dan lingkaran dalam (lanjutan Contoh 1)
+% 
+% Lingkaran luar adalah lingkaran yang melalui A, B, dan C.
+>c=circleThrough(A,B,C);
+>R=getCircleRadius(c); O=getCircleCenter(c);
+>plotPoint(O,"O"); plotCircle(c,"Lingkaran luar"):
+ %image% TugasAplikom7_Ridwan25030630091-006.png
+>O, R
+[1.16667,  1.16667]
+1.17851130198
+% Pusat lingkaran luar O = (1,167; 1,167) dan jari-jarinya R = 1,1785.
+% Dari R ini dapat dihitung keliling dan luas lingkaran luar:
+>2*pi*R, pi*R^2
+7.40480489693
+4.36332312999
+% Kelilingnya 7,405 dan luasnya 4,363. Bahwa ketiga titik sudut memang
+% berada pada lingkaran dapat dicek dari jaraknya ke pusat O:
+>distance(A,O), distance(B,O), distance(C,O), R
+1.17851130198
+1.17851130198
+1.17851130198
+1.17851130198
+% Keempat nilainya sama, yaitu 1,1785. Karena pusat O=(7/6, 7/6) dan
+% R^2=25/18, persamaan lingkaran luar adalah
+% 
+% latex: \left(x-\frac76\right)^2+\left(y-\frac76\right)^2=\frac{25}{18}
+% %image% TugasAplikom7_Ridwan25030630091-007.png
+% // latex: \left(x-\frac76\right)^2+\left(y-\frac76\right)^2=\frac{25}{18}
+% 
+% atau dalam bentuk umum
+% 
+% latex: 3x^2+3y^2-7x-7y+4=0.
+% %image% TugasAplikom7_Ridwan25030630091-008.png
+% // latex: 3x^2+3y^2-7x-7y+4=0.
+% 
+% Pengecekan dengan ketiga titik sudut:
+>function fLuar(P) := 3*P[1]^2+3*P[2]^2-7*P[1]-7*P[2]+4;
+>fLuar(A), fLuar(B), fLuar(C)
+0
+0
+0
+% Ketiganya bernilai 0, jadi A, B, dan C memenuhi persamaan tersebut.
+% Selanjutnya lingkaran dalam, yang pusatnya adalah perpotongan garis bagi
+% sudut, dan jari-jarinya adalah jarak pusat ke salah satu sisi.
+>l=angleBisector(A,C,B); g=angleBisector(C,A,B);
+>P=lineIntersection(l,g)
+[0.86038,  0.86038]
+>color(5); plotLine(l); plotLine(g); color(1); plotPoint(P,"P");
+>r=norm(P-projectToLine(P,lineThrough(A,B)))
+0.509653732104
+>plotCircle(circleWithCenter(P,r),"Lingkaran dalam"):
+ %image% TugasAplikom7_Ridwan25030630091-009.png
+% Pusat lingkaran dalam P = (0,860; 0,860) dan jari-jarinya r = 0,5097,
+% sehingga persamaannya kira-kira
+% 
+% latex: (x-0,860)^2+(y-0,860)^2 = 0,2597.
+% %image% TugasAplikom7_Ridwan25030630091-010.png
+% // latex: (x-0,860)^2+(y-0,860)^2 = 0,2597.
+% 
+% Pusat dan jari-jari suatu lingkaran dapat dibaca dengan
+% getCircleCenter dan getCircleRadius.
+% 
+% ** Titik potong garis dengan lingkaran
+% 
+% Garis yang melalui B(1,2) dan C(2,1) dipotongkan dengan lingkaran
+% berpusat di A(1,0) dan berjari-jari 4.
+>A=[1,0]; c=circleWithCenter(A,4);
+>B=[1,2]; C=[2,1]; l=lineThrough(B,C);
+>aspect(1); setPlotRange(5); plotCircle(c); plotLine(l);
+>{P1,P2,f}=lineCircleIntersections(l,c);
+>P1, P2, f
+[4.64575,  -1.64575]
+[-0.645751,  3.64575]
+2
+>plotPoint(P1); plotPoint(P2):
+ %image% TugasAplikom7_Ridwan25030630091-011.png
+% Garis x+y=3 memotong lingkaran tersebut di dua titik, yaitu (4,646;
+% -1,646) dan (-0,646; 3,646). Nilai f=2 menyatakan banyaknya titik
+% potong. Bentuk eksaknya diperoleh dengan substitusi y=3-x ke
+% (x-1)^2+y^2=16, sehingga 2x^2-8x+10=16 atau x^2-4x-3=0, dengan akar
+% x=2 +- akar 7. Titik potongnya adalah (2+akar 7, 1-akar 7) dan (2-akar
+% 7, 1+akar 7). Hasil ini dapat dicek dengan Maxima:
+>$solve([x+y=3,(x-1)^2+y^2=16],[x,y])
+% 
+% Titik potong dua lingkaran dapat dipakai untuk membuat garis sumbu ruas
+% garis AB, yaitu dengan dua lingkaran yang berjari-jari AB dan masing-masing
+% berpusat di A dan di B.
+>A=[2,2]; B=[-1,-2];
+>c1=circleWithCenter(A,distance(A,B)); c2=circleWithCenter(B,distance(A,B));
+>{P1,P2,f}=circleCircleIntersections(c1,c2);
+>l=lineThrough(P1,P2);
+>aspect(1); setPlotRange(5); plotCircle(c1); plotCircle(c2);
+>plotPoint(A,"A"); plotPoint(B,"B"); plotSegment(A,B); plotLine(l):
+ %image% TugasAplikom7_Ridwan25030630091-012.png
+% Garis yang melalui kedua titik potong adalah garis sumbu AB, yaitu garis
+% yang tegak lurus AB dan melalui titik tengahnya.
+% 
+% ** Latihan Contoh 1: titik singgung lingkaran dalam
+% 
+% Berikut penyelesaian latihan dosen dengan titik A(1,0), B(0,1), dan
+% C(2,2).
+>aspect(1); setPlotRange(-0.5,2.5,-0.5,2.5);
+>A=[1,0]; B=[0,1]; C=[2,2];
+>plotSegment(A,B); plotSegment(B,C); plotSegment(A,C);
+>P=lineIntersection(angleBisector(A,C,B),angleBisector(C,A,B));
+>r=norm(P-projectToLine(P,lineThrough(A,B)));
+>T1=projectToLine(P,lineThrough(A,B)), T2=projectToLine(P,lineThrough(B,C)), T3=projectToLine(P,lineThrough(A,C))
+[0.5,  0.5]
+[0.632456,  1.31623]
+[1.31623,  0.632456]
+% No. 1: titik singgung dicari dengan memproyeksikan pusat dalam P ke
+% setiap sisi. Hasilnya T1=(0,5; 0,5), T2=(0,632; 1,316), dan
+% T3=(1,316; 0,632).
+>plotCircle(circleWithCenter(P,r)); plotPoint(P,"P");
+>plotSegment(T1,T2); plotSegment(T2,T3); plotSegment(T3,T1);
+>color(2); plotSegment(P,T1); plotSegment(P,T2); plotSegment(P,T3); color(1):
+ %image% TugasAplikom7_Ridwan25030630091-013.png
+% No. 2 dan 5: segitiga T1T2T3 terbentuk dari ketiga titik singgung.
+% Jari-jari lingkaran dalam digambar merah dari P ke setiap titik singgung.
+>distance(T1,T2), distance(T2,T3), distance(T1,T3)
+0.826905214631
+0.966999966873
+0.826905214631
+>areaTriangle(T1,T2,T3)
+0.324341649025
+% Dua sisinya sama panjang (0,827), sehingga segitiga singgung juga sama
+% kaki, seperti segitiga ABC yang CA = CB. Luasnya (No. 3) sekitar 0,3243.
+>abs(areaTriangle(T1,T2,T3)), 1.5*r/(2*getCircleRadius(circleThrough(A,B,C)))
+0.324341649025
+0.324341649025
+% Kedua nilai sama, sehingga luas segitiga singgung = L*r/(2R) dengan L
+% luas segitiga ABC.
+>lineIntersection(angleBisector(A,B,C),angleBisector(A,C,B))
+[0.86038,  0.86038]
+% No. 4: garis bagi sudut B dipotongkan dengan garis bagi sudut C, dan
+% titiknya sama dengan P (0,860; 0,860). Jadi ketiga garis bagi sudut
+% berpotongan di satu titik.
+>s=(distance(A,B)+distance(B,C)+distance(A,C))/2
+2.94317475869
+>r*s, pi*r^2, pi*getCircleRadius(circleThrough(A,B,C))^2
+1.5
+0.81601903655
+4.36332312999
+% No. 6: luas segitiga sama dengan r*s, yaitu 1,5 = 0,5097 x 2,943. Luas
+% lingkaran dalam 0,816 dan luas lingkaran luar 4,363. Kedua luas lingkaran
+% itu tidak berbanding langsung dengan luas segitiga, tetapi r dan R
+% dihubungkan oleh L = r*s dan R = abc/(4L).
+% 
+% * 4. Geometri Simbolik dan Rumus Heron
+% 
+% Dengan tanda &= semua fungsi di atas dihitung oleh Maxima, sehingga
+% hasilnya eksak.
+>A &= [1,0]; B &= [0,1]; C &= [2,2];
+>c &= lineThrough(B,C); $getLineEquation(c,x,y), $solve(%,y) | expand
+ %image% TugasAplikom7_Ridwan25030630091-014.png
+% // latex: 2\,y-x=2
+ %image% TugasAplikom7_Ridwan25030630091-015.png
+% // latex: \left[ y=\frac{x}{2}+1 \right] 
+>h &= perpendicular(A,c); Q &= lineIntersection(c,h); $Q
+ %image% TugasAplikom7_Ridwan25030630091-016.png
+% // latex: \left[ \frac{2}{5} , \frac{6}{5} \right] 
+>$distance(A,Q)
+ %image% TugasAplikom7_Ridwan25030630091-017.png
+% // latex: \frac{3}{\sqrt{5}}
+>cc &= circleThrough(A,B,C); $cc
+ %image% TugasAplikom7_Ridwan25030630091-018.png
+% // latex: \left[ \frac{7}{6} , \frac{7}{6} , \frac{5}{3\,\sqrt{2}} \right] 
+% Persamaan garis BC adalah 2y-x=2 (atau y=x/2+1). Kaki tinggi
+% Q=(2/5,6/5), jarak AQ=3/akar 5, dan lingkaran luar [7/6, 7/6, 5/(3
+% akar 2)]. Semuanya cocok dengan hasil numerik sebelumnya, misalnya
+% 5/(3 akar 2) = 1,1785.
+% 
+% ** Persamaan garis melalui dua titik
+% 
+% Untuk titik (x1,y1) dan (x2,y2), persamaan garis yang melaluinya
+% adalah
+% 
+% latex: (y_1-y_2)\,x+(x_2-x_1)\,y=(y_1-y_2)\,x_1+(x_2-x_1)\,y_1
+% %image% TugasAplikom7_Ridwan25030630091-019.png
+% // latex: (y_1-y_2)\,x+(x_2-x_1)\,y=(y_1-y_2)\,x_1+(x_2-x_1)\,y_1
+% 
+% Rumus ini sama dengan keluaran lineThrough. Untuk B(0,1) dan C(2,2)
+% diperoleh -x+2y=2, sesuai dengan hasil pada Contoh 1.
+% 
+% ** Rumus Heron
+% 
+% Luas segitiga dengan sisi a, b, c dapat dihitung tanpa tinggi:
+% 
+% latex: L=\sqrt{s(s-a)(s-b)(s-c)},\quad s=\frac{a+b+c}{2}
+% %image% TugasAplikom7_Ridwan25030630091-020.png
+% // latex: L=\sqrt{s(s-a)(s-b)(s-c)},\quad s=\frac{a+b+c}{2}
+% 
+% Saya menjalankan contoh dari dosen, tetapi perintah solve pada Maxima
+% memberi hasil kosong. Karena itu rumusnya saya turunkan langsung: C
+% diletakkan di (0,0), B di (a,0), dan A di (x,y). Dari x^2+y^2=b^2 dan
+% (x-a)^2+y^2=c^2 diperoleh x=(a^2+b^2-c^2)/(2a), lalu y dari
+% y^2=b^2-x^2, dan luasnya a*y/2. Variabel a, b, dan c sudah dipakai di
+% bagian lain, sehingga di sini saya memakai nama pa, pb, dan pc agar
+% tidak terjadi bentrokan nilai.
+>&assume(pa>0,pb>0,pc>0);
+>x0 &= (pa^2+pb^2-pc^2)/(2*pa);
+>y2 &= pb^2-x0^2;
+>function H(pa,pb,pc) &= sqrt(factor(pa^2*y2/4)); $'H(pa,pb,pc)=H(pa,pb,pc)
+ %image% TugasAplikom7_Ridwan25030630091-021.png
+% // latex: H\left({\it pa} , {\it pb} , {\it pc}\right)=\frac{\sqrt{\left(-  {\it pc}+{\it pb}+{\it pa}\right)\,\left({\it pc}-{\it pb}+{\it pa}  \right)\,\left({\it pc}+{\it pb}-{\it pa}\right)}\,\sqrt{{\it pc}+  {\it pb}+{\it pa}}}{4}
+>H(3,4,5), H(2,5,6)
+6
+4.6837484988
+>s=(3+4+5)/2; sqrt(s*(s-3)*(s-4)*(s-5))
+6
+% Hasilnya H(3,4,5)=6, sama dengan hasil rumus Heron biasa pada baris
+% terakhir. Segitiga 3-4-5 adalah segitiga siku-siku, sehingga luasnya
+% juga 3*4/2 = 6. Untuk sisi 2, 5, dan 6 luasnya sekitar 4,684.
+>aspect(1.5);
+>plot2d("H(3,4,x)",1,7):
+ %image% TugasAplikom7_Ridwan25030630091-022.png
+% Grafik di atas menunjukkan luas segitiga dengan sisi 3, 4, dan x. Luas
+% maksimum tercapai saat x=5 (siku-siku). Luasnya nol di x=1 dan x=7
+% karena pada kedua nilai itu segitiganya menjadi garis lurus.
+% 
+% ** Garis Euler
+% 
+% Pada segitiga yang tidak sama sisi, titik tinggi H, pusat lingkaran luar
+% O, dan titik berat M terletak pada satu garis yang disebut garis Euler.
+% Jaraknya memenuhi MH = 2 x MO.
+>A=[-1,-1]; B=[2,0]; C=[1,2];
+>aspect(1); setPlotRange(3); plotPoint(A,"A"); plotPoint(B,"B"); plotPoint(C,"C");
+>plotSegment(A,B,""); plotSegment(B,C,""); plotSegment(C,A,"");
+>O=getCircleCenter(circleThrough(A,B,C));
+>H=lineIntersection(perpendicular(A,lineThrough(B,C)),perpendicular(B,lineThrough(A,C)))
+[1.57143,  0.285714]
+>M=(A+B+C)/3
+[0.666667,  0.333333]
+>plotCircle(circleThrough(A,B,C)); plotPoint(O,"O"); plotPoint(H,"H"); plotPoint(M,"M");
+>plotLine(lineThrough(H,O),"Garis Euler"):
+ %image% TugasAplikom7_Ridwan25030630091-023.png
+>distance(M,H)/distance(M,O)
+2
+% Diperoleh H=(11/7, 2/7), O=(3/14, 5/14), M=(2/3, 1/3), dan
+% perbandingan MH/MO tepat 2. Pada gambar, ketiga titik terlihat berada
+% pada satu garis.
+% 
+% * 5. Parabola, Elips, dan Hiperbola
+% 
+% ** Teori singkat
+% 
+% Ketiga kurva ini adalah himpunan titik yang memenuhi suatu syarat
+% jarak.
+%% - Parabola: jarak ke titik fokus sama dengan jarak ke garis arah.
+% Dengan fokus (0,p) dan garis arah y=-p, persamaannya x^2=4py.
+%% - Elips: jumlah jarak ke dua titik fokus selalu tetap, sebesar 2a.
+% Dengan fokus (-c,0) dan (c,0), persamaannya x^2/a^2+y^2/b^2=1 dengan
+% b^2=a^2-c^2.
+%% - Hiperbola: selisih jarak ke dua titik fokus selalu tetap, sebesar
+% 2a. Dengan fokus (-c,0) dan (c,0), persamaannya x^2/a^2-y^2/b^2=1
+% dengan b^2=c^2-a^2. Cara menggambarnya sama: syarat jarak ditulis
+% sebagai ekspresi dalam x dan y yang bernilai 0, lalu kontur level 0
+% dari ekspresi itu digambar.
+% 
+% ** Parabola dari fokus dan garis arah
+% 
+% Parabola dengan fokus F(0,1) dan garis arah y=-1 memenuhi
+% 
+% latex: \sqrt{x^2+(y-1)^2}=|y+1|
+% %image% TugasAplikom7_Ridwan25030630091-024.png
+% // latex: \sqrt{x^2+(y-1)^2}=|y+1|
+>aspect(1); setPlotRange(-6,6,-3,9);
+>plot2d("sqrt(x^2+(y-1)^2)-abs(y+1)",a=-6,b=6,c=-3,d=9,level=0,n=100);
+>plotPoint([0,1],"F"); plotLine(lineThrough([0,-1],[1,-1]),"garis arah"):
+ %image% TugasAplikom7_Ridwan25030630091-025.png
+>$solve(x^2+(y-1)^2=(y+1)^2,y)
+ %image% TugasAplikom7_Ridwan25030630091-026.png
+% // latex: \left[ y=\frac{x^2}{4} \right] 
+% Setelah kedua ruas dikuadratkan diperoleh y=x^2/4, yaitu x^2=4y. Hasil
+% ini sesuai dengan bentuk x^2=4py untuk p=1. Sebagai pengecekan diambil
+% titik T(4,4) pada kurva:
+>F=[0,1]; T=[4,4];
+>distance(T,F), distance(T,projectToLine(T,lineThrough([0,-1],[1,-1])))
+5
+5
+% Keduanya bernilai 5, jadi T berjarak sama ke fokus dan ke garis arah.
+% 
+% ** Elips dari dua fokus
+% 
+% Elips dengan fokus P(-3,0) dan Q(3,0) serta jumlah jarak 10 memenuhi
+% latex: d(X,P)+d(X,Q)=10
+>aspect(1.4); setPlotRange(-7,7,-5,5);
+>plot2d("sqrt((x+3)^2+y^2)+sqrt((x-3)^2+y^2)-10",a=-7,b=7,c=-5,d=5,level=0,n=100);
+>P=[-3,0]; Q=[3,0]; plotPoint(P,"P"); plotPoint(Q,"Q"):
+ %image% TugasAplikom7_Ridwan25030630091-027.png
+>distance([0,4],P)+distance([0,4],Q), distance([5,0],P)+distance([5,0],Q)
+10
+10
+% Titik (0,4) dan (5,0) sama-sama berjumlah jarak 10, jadi keduanya berada
+% pada elips. Setengah sumbu panjang a=5 dan jarak fokus c=3, sehingga
+% b=akar(25-9)=4. Persamaan elipsnya x^2/25 + y^2/16 = 1. Sebagai
+% pengecekan tambahan, titik (3; 3,2) memenuhi persamaan tersebut:
+>distance([3,16/5],P)+distance([3,16/5],Q)
+10
+% Hasilnya 10, sesuai dengan syarat elips.
+% 
+% ** Hiperbola dari dua fokus
+% 
+% Hiperbola dengan fokus P(-5,0) dan Q(5,0) serta selisih jarak 6
+% memenuhi 
+%% latex: |d(X,P)-d(X,Q)|=6
+% %image% TugasAplikom7_Ridwan25030630091-028.png
+% // latex: |d(X,P)-d(X,Q)|=6
+>aspect(1.25);
+>plot2d("abs(sqrt((x+5)^2+y^2)-sqrt((x-5)^2+y^2))-6",a=-10,b=10,c=-8,d=8,level=0,n=100);
+>P=[-5,0]; Q=[5,0]; plotPoint(P,"P"); plotPoint(Q,"Q"):
+ %image% TugasAplikom7_Ridwan25030630091-029.png
+>T=[5,16/3]; abs(distance(T,P)-distance(T,Q))
+6
+% Selisihnya 6, jadi T berada pada hiperbola. Di sini a=3, c=5, dan
+% b=akar(25-9)=4, sehingga persamaannya x^2/9 - y^2/16 = 1. Berbeda
+% dengan elips, kurva ini terbuka dan terdiri dari dua cabang.
+% 
+% ** Sekilas trigonometri rasional
+% 
+% Wildberger mengganti jarak dengan quadrance (kuadrat jarak) dan sudut
+% dengan spread (kuadrat sinus sudut). Hukum cosinus berubah menjadi
+% cross law:
+% 
+% latex: (c+b-a)^2=4bc\,(1-s_a)
+% %image% TugasAplikom7_Ridwan25030630091-030.png
+% // latex: (c+b-a)^2=4bc\,(1-s_a)
+% 
+% Rumus ini diuji pada segitiga siku-siku 3-4-5, dengan a, b, c adalah
+% quadrance sisi-sisinya.
+>a &= 3^2; b &= 4^2; c &= 5^2; &a+b=c
+
+                               25 = 25
+
+>sa &= a/c; $sa
+ %image% TugasAplikom7_Ridwan25030630091-031.png
+% // latex: \frac{9}{25}
+>$crosslaw(a,b,c,sa)
+ %image% TugasAplikom7_Ridwan25030630091-032.png
+% // latex: 1024=1024
+>$spread(a,b,c)
+ %image% TugasAplikom7_Ridwan25030630091-033.png
+% // latex: \frac{9}{25}
+% Teorema Pythagoras berbentuk 9+16=25. Spread di titik A sama dengan
+% 9/25, yaitu bilangan rasional sehingga tidak memerlukan arcsin, dan
+% cross law menghasilkan 1024=1024, jadi rumusnya terbukti benar.
+% 
+% * 6. Latihan
+% 
+% ** Latihan 1: segi-n beraturan
+% 
+% Titik sudut segi-n beraturan berada pada lingkaran luar berpusat O dengan
+% sudut pusat 360/n derajat. Untuk n ganjil titik pertama diambil di bagian
+% atas, dan untuk n genap titik pertama diambil di sebelah kanan.
+>function segin(n,r) ...
+$  if mod(n,2)==1 then t0=pi/2; else t0=0; endif;
+$  t=t0+(0:n)*2*pi/n;
+$  x=r*cos(t); y=r*sin(t);
+$  aspect(1);
+$  plot2d(x,y,r=1.4*r);
+$  plot2d(x,y,>points,>add);
+$endfunction
+>segin(5,3):
+ %image% TugasAplikom7_Ridwan25030630091-034.png
+>segin(6,3):
+ %image% TugasAplikom7_Ridwan25030630091-035.png
+>2*3*sin(pi/5), 5/2*3^2*sin(2*pi/5)
+3.52671151375
+21.3987716166
+% Fungsi segin menggambar segi-n beraturan untuk jari-jari r. Dua
+% perintah pertama menggambar segi-5 dan segi-6, dan nilai n dapat
+% diganti. Panjang sisi segi-5 untuk r=3 adalah 2 r sin(pi/5) = 3,527
+% dan luasnya (n/2) r^2 sin(2pi/n) = 21,40.
+% 
+% ** Latihan 2: parabola melalui tiga titik
+% 
+% Tentukan parabola yang melalui titik (1,2), (2,3), dan (3,6).
+% 
+% latex: y=ax^2+bx+c
+% %image% TugasAplikom7_Ridwan25030630091-036.png
+% // latex: y=ax^2+bx+c
+% 
+% Setiap titik disubstitusi ke persamaan tersebut sehingga terbentuk
+% tiga persamaan linear dengan tiga bilangan tak diketahui. Koefisien
+% ketiga persamaan itu disusun sebagai baris-baris matriks M, dan
+% sistemnya diselesaikan dengan invers matriks.
+>M=[1,1,1;4,2,1;9,3,1]; yp=[2;3;6];
+>abc=inv(M).yp
+            1 
+           -2 
+            3 
+>a=abc[1,1]; b=abc[2,1]; c=abc[3,1];
+>M.abc
+            2 
+            3 
+            6 
+>aspect(1.5); plot2d("a*x^2+b*x+c",0,4); plot2d([1,2,3],[2,3,6],>points,>add):
+ %image% TugasAplikom7_Ridwan25030630091-037.png
+% Hasilnya a=1, b=-2, dan c=3, sehingga parabolanya y=x^2-2x+3.
+% Perkalian M.abc mengembalikan 2, 3, 6, jadi ketiga titik tepat berada
+% pada kurva.
+% 
+% ** Latihan 3: segi-4 garis singgung
+% 
+% Syarat dari dosen: keempat garis bagi sudutnya bertemu di satu titik.
+% Pada catatan latihan tertulis "hasil kali sisi berhadapan sama",
+% padahal syarat yang benar adalah jumlah sisi yang berhadapan sama
+% (teorema Pitot): AB+CD = BC+DA. Alasannya, dua garis singgung dari
+% satu titik sudut sama panjang, sehingga kedua jumlah itu sama-sama
+% setengah keliling.
+>A=[0,0]; B=[2,1]; C=[5,0]; D=[2,-1];
+>aspect(1.75); setPlotRange(-1,6,-2,2);
+>plotSegment(A,B); plotSegment(B,C); plotSegment(C,D); plotSegment(D,A);
+>distance(A,B)+distance(C,D), distance(B,C)+distance(D,A)
+5.39834563767
+5.39834563767
+>P=lineIntersection(angleBisector(D,A,B),angleBisector(A,B,C))
+[2.07107,  0]
+>lineIntersection(angleBisector(B,C,D),angleBisector(C,D,A))
+[2.07107,  0]
+>r=norm(P-projectToLine(P,lineThrough(A,B)))
+0.926209682669
+>norm(P-projectToLine(P,lineThrough(C,D))), norm(P-projectToLine(P,lineThrough(B,C)))
+0.926209682669
+0.926209682669
+>plotPoint(P,"P"); plotCircle(circleWithCenter(P,r)):
+ %image% TugasAplikom7_Ridwan25030630091-038.png
+% Kedua jumlah sisi sama (sekitar 5,398) dan dua pasang garis bagi sudut
+% bertemu di titik yang sama, yaitu P=(2,071; 0). Jadi layang-layang ini
+% adalah segi-4 garis singgung. Titik P berjarak sama (0,926) ke keempat
+% sisi, dan lingkaran dalamnya digambar dengan pusat P. Sebagai
+% pembanding, segi empat A(0,0), B(4,0), C(5,3), D(0,2) memberi AB+CD =
+% 9,10 dan BC+DA = 5,16, sehingga bukan segi-4 garis singgung.
+% 
+% ** Latihan 4 dan 5: elips dan hiperbola
+% 
+% Kedua latihan ini sudah dikerjakan pada bagian 5, yaitu elips dengan
+% fokus P(-3,0), Q(3,0) dan hiperbola dengan fokus P(-5,0), Q(5,0),
+% lengkap dengan titik uji pada masing-masing kurva.
+% 
+% ** Soal tambahan dari buku
+% 
+% Soal 1 (Algebra and Trigonometry): tunjukkan bahwa A(-2,9), B(4,6),
+% C(1,0), dan D(-5,3) adalah titik sudut sebuah persegi.
+>A=[-2,9]; B=[4,6]; C=[1,0]; D=[-5,3];
+>distance(A,B), distance(B,C), distance(C,D), distance(D,A)
+6.7082039325
+6.7082039325
+6.7082039325
+6.7082039325
+>distance(A,C), distance(B,D)
+9.48683298051
+9.48683298051
+>aspect(8/7); setPlotRange(-8,8,-2,12); plotPoint(A,"A"); plotPoint(B,"B"); plotPoint(C,"C"); plotPoint(D,"D");
+>plotSegment(A,B); plotSegment(B,C); plotSegment(C,D); plotSegment(D,A):
+ %image% TugasAplikom7_Ridwan25030630091-039.png
+% Keempat sisinya sama panjang (akar 45) dan kedua diagonalnya juga sama
+% panjang (akar 90). Segi empat dengan empat sisi sama panjang adalah
+% belah ketupat, dan jika diagonalnya sama panjang maka belah ketupat
+% itu adalah persegi.
+% 
+% Soal 2: tunjukkan bahwa A(-1,3), B(3,11), dan C(5,15) segaris.
+>A=[-1,3]; B=[3,11]; C=[5,15];
+>distance(A,B)+distance(B,C)-distance(A,C)
+0
+>areaTriangle(A,B,C)
+0
+% Selisih jumlah jarak dengan AC adalah 0, atau sangat mendekati 0 karena
+% pembulatan. Secara eksak, 4 akar 5 + 2 akar 5 = 6 akar 5, sehingga B
+% terletak di antara A dan C. Luas segitiga ABC juga 0, jadi ketiga titik
+% segaris.
+% 
+% Soal 3: tentukan persamaan elips dengan pusat (2,-3), puncak (-8,-3) dan
+% (12,-3), serta fokus (-4,-3) dan (8,-3).
+>a=12-2, c=8-2, b=sqrt(a^2-c^2)
+10
+6
+8
+>aspect(1.2); plot2d("(x-2)^2/100+(y+3)^2/64-1",a=-10,b=14,c=-13,d=7,level=0);
+>plot2d([-4,8],[-3,-3],>points,>add):
+ %image% TugasAplikom7_Ridwan25030630091-040.png
+% Jarak pusat ke puncak a=10 dan jarak pusat ke fokus c=6, sehingga b^2
+% = 100-36 = 64. Persamaan elipsnya (x-2)^2/100 + (y+3)^2/64 = 1.
+% 
+% Soal 4 (Elementary Geometry): lingkaran berjari-jari 15 mm dengan tali
+% busur 24 mm. Tentukan jarak pusat ke tali busur.
+>r=15; d=sqrt(r^2-(24/2)^2)
+9
+>aspect(1); setPlotRange(-17,17,-17,17); plotCircle(circleWithCenter([0,0],r));
+>plotSegment([-12,-d],[12,-d]); plotSegment([0,0],[0,-d]):
+ %image% TugasAplikom7_Ridwan25030630091-041.png
+% Garis dari pusat yang tegak lurus tali busur membagi tali busur menjadi
+% dua bagian sama panjang (12 mm). Segitiga siku-siku dengan sisi miring 15
+% dan sisi tegak 12 memberi jarak pusat ke tali busur sebesar 9 mm.
+% 
+% Soal 5: dua lingkaran berpotongan dengan tali busur persekutuan 10,
+% jari-jari salah satu lingkaran 13, dan jarak kedua pusat 16. Tentukan
+% jari-jari lingkaran yang lain.
+>r1=13; h1=sqrt(r1^2-5^2), h2=16-h1, r2=sqrt(5^2+h2^2)
+12
+4
+6.40312423743
+>sqrt(5^2+(16+h1)^2)
+28.4429253067
+% Jarak pusat pertama ke tali busur adalah 12. Jika tali busur berada di
+% antara kedua pusat, jarak pusat kedua ke tali busur adalah 16-12 = 4,
+% sehingga r2 = akar 41 (sekitar 6,40). Jika tali busur berada di sisi
+% pusat pertama yang berlawanan dengan pusat kedua, jaraknya 16+12 = 28
+% sehingga r2 = akar 809 (sekitar 28,44). Kedua kemungkinan sesuai dengan
+% data soal, jadi jawabannya bergantung pada gambar yang menyertai soal.
+% 
+% Soal 6: lingkaran dalam segitiga ABC dengan AB=9, BC=8, dan AC=7.
+% Tentukan panjang AM, BM, dan CN, dengan M titik singgung pada AB dan N
+% titik singgung pada sisi lain yang melalui C.
+>s=(9+8+7)/2; AM=s-8, BM=s-7, CN=s-9
+4
+5
+3
+% Dua garis singgung dari satu titik sama panjang, sehingga panjang garis
+% singgung dari tiap titik sudut sama dengan s dikurangi panjang sisi di
+% hadapannya. Hasilnya AM=4, BM=5, dan CN=3.
+% 
+% Soal 7: dua lingkaran berjari-jari 3 dan 9 dengan jarak pusat 20.
+% Tentukan panjang garis singgung persekutuan dalam.
+>sqrt(20^2-(3+9)^2)
+16
+% Hasilnya 16 (akar 256), karena segitiga siku-siku yang terbentuk
+% mempunyai sisi miring 20 dan salah satu sisi tegaknya 3+9=12.
+% 
+% Soal 8: lingkaran dalam sebuah segitiga siku-siku berjari-jari 6 dan
+% hipotenusanya 29. Tentukan panjang kedua segmen hipotenusa yang
+% dibentuk oleh titik singgung.
+>jumlah=2*6+29; kali=(jumlah^2-29^2)/2;
+>a=(jumlah+sqrt(jumlah^2-4*kali))/2, b=(jumlah-sqrt(jumlah^2-4*kali))/2
+21
+20
+>s=(a+b+29)/2; s-a, s-b
+14
+15
+% Rumus r=(a+b-c)/2 memberi a+b=41, dan a^2+b^2=29^2 memberi ab=420,
+% sehingga kedua kaki segitiga adalah 21 dan 20. Segmen hipotenusanya
+% adalah s dikurangi tiap kaki, yaitu 14 dan 15 (jumlahnya 29).
+% 
+% Soal 9 (contoh pada dokumentasi Euler): sebuah benda berdiameter
+% d=100 m tampak dari pengamat dengan sudut 12,5 derajat. Tentukan jarak
+% pengamat.
+>alfa=12.5; d=100; jarak=(d/2)/tan(rad(alfa/2))
+456.54674095
+% Separuh sudut pandang adalah alfa/2, sehingga tan(alfa/2) = (d/2)/jarak.
+% Dengan sudut diubah ke radian, jaraknya sekitar 456,5 m. Jika benda itu
+% berupa bola dan yang dimaksud adalah jarak ke pusatnya, rumusnya memakai
+% sinus:
+>jarakPusat=(d/2)/sin(rad(alfa/2))
+459.276525279
+>
+% Hasilnya sekitar 459,3 m. Pilihan antara kedua rumus bergantung pada
+% bunyi soal aslinya.
+% 
+% * Kesimpulan
+% 
+% EMT dengan file geometry.e dapat dipakai untuk menggambar sekaligus
+% menghitung objek geometri. Titik, garis, lingkaran, dan segitiga cukup
+% disimpan sebagai vektor, lalu fungsi seperti lineThrough,
+% lineIntersection, circleThrough, dan angleBisector memberikan hasil
+% numerik. Dengan tanda &= hasilnya dapat diperoleh dalam bentuk eksak.
+% Kurva parabola, elips, dan hiperbola digambar dari syarat jaraknya.
+% 
+% Poin penting:
+% - panggil load geometry dan atur setPlotRange sebelum menggambar
+% - garis disimpan sebagai [a,b,c] (ax+by=c), lingkaran sebagai [x,y,r]
+% - pusat lingkaran luar berasal dari garis sumbu, pusat lingkaran dalam dari garis bagi sudut
+% - parabola, elips, dan hiperbola digambar sebagai kontur level 0 dari syarat jaraknya
+% - atur aspect sesuai rentang bidang agar lingkaran tidak tampak lonjong
+% 
+% Contoh titik Fermat, Bola Dandelin (memerlukan Povray), dan geometri
+% bola (spherical.e) belum saya kerjakan dalam laporan ini.
+% 
+% * Rujukan
+% 
+% - Dokumentasi Euler Math Toolbox (R. Grothmann), bagian Geometry.
+% - Buku Geometri sumber soal (lengkapi dengan judul, penulis, dan tahun).

@@ -1,0 +1,522 @@
+﻿% Nama : Ridwan Maulana
+%% NIM  : 25030630091
+%% Kelas: Matematika F
+% 
+% * Euler Math Toolbox: Pengenalan dan Latihan Dasar
+% 
+% ** Pendahuluan
+%% Euler Math Toolbox (EMT) adalah perangkat lunak matematika gratis yang
+% dapat digunakan untuk komputasi numerik, perhitungan simbolik, dan
+% visualisasi grafik. EMT menyediakan antarmuka berbentuk notebook yang
+% memungkinkan pengguna menggabungkan teks penjelasan, perintah
+% matematika, dan hasil perhitungan dalam satu berkas.
+% 
+% EMT dapat bekerja dengan bilangan riil, kompleks, interval, vektor,
+% dan matriks, serta menghasilkan grafik dua dimensi (2D) dan tiga
+% dimensi (3D). Untuk komputasi simbolik, EMT terintegrasi dengan
+% Maxima.
+%% Pengembangan dan penggunaannya didukung oleh beberapa komponen
+% berikut.
+%% - EMT dikembangkan oleh René Grothmann, yang menangani bagian numerik,
+% antarmuka grafis (GUI), dan integrasi dengan Maxima.
+% 
+% - Maxima merupakan perangkat lunak open source yang digunakan untuk
+% melakukan komputasi simbolik, seperti menyederhanakan ekspresi
+% aljabar, menghitung turunan, dan mengintegralkan fungsi.
+% 
+% Pintasan yang paling sering dipakai:
+%% - [F5] mengedit teks penjelasan, sedangkan [Ctrl]+[Enter] memecah
+% perintah menjadi beberapa baris dengan tanda (...).
+%% - [Alt]+[Insert] menyisipkan baris perintah baru.
+%% - [F11] mengatur tampilan layar, [Ctrl]+[G] menampilkan atau
+% menyembunyikan jendela grafik, dan [TAB] beralih antara tampilan
+% grafik dan notebook.
+% 
+% Pada tugas ini, saya memakai notebook EMT untuk mempelajari perintah
+% dasarnya, lalu mengolahnya menjadi dokumen Word.
+>//
+% 
+% 
+% ** Komentar (Teks Uraian)
+%% Teks hijau di EMT dapat diberi markup agar lebih rapi. Tanda * dan **
+% digunakan untuk judul dan subjudul, sedangkan latex:, mathjax:, dan
+% maxima: untuk menampilkan rumus matematika. Alamat web dapat ditulis langsung atau menggunakan format See: alamat | teks. Selain itu, image: digunakan untuk menyisipkan gambar dari folder images, sedangkan --- membuat garis pemisah.
+% 
+% 
+% 
+% Hasil nyata dari sintaks di atas saya tulis di bawah ini.
+% 
+% * Contoh Judul
+% 
+% ** Contoh Sub-Judul
+% 
+% latex: F(x) = \int_a^x f(t) \, dt
+% %image% TugasApkom2_Ridwan25030630091-001.png
+% // latex: F(x) = \int_a^x f(t) \, dt
+% 
+% mathjax: \frac{x^2-1}{x-1} = x + 1
+% %image% TugasApkom2_Ridwan25030630091-002.png
+% // mathjax:  \frac{x^2-1}{x-1} = x + 1
+% 
+% maxima: 'integrate(x^3,x) = integrate(x^3,x) + C
+% %image% TugasApkom2_Ridwan25030630091-003.png
+% // latex: \int {x^3}{\;dx}=C+\frac{x^4}{4}
+% 
+% http://www.euler-math-toolbox.de
+% 
+% See: http://www.euler-math-toolbox.de | Situs EMT
+% 
+% ---
+% 
+% Catatan: rumus latex harus ada di awal baris sendiri, dan paragraf
+% dipisahkan dengan satu baris kosong. Gambar (image:) dibaca dari
+% folder images di samping notebook, jadi file gambarnya harus ada di
+% sana.
+>// baris perintah diawali dengan >, komentar (keterangan) diawali dengan //
+% 
+% ** Baris Perintah dan fungsi dasar
+% 
+% EMT bekerja melalui baris perintah yang diawali tanda >.
+%% Beberapa perintah dapat ditulis dalam satu baris dan dipisahkan
+%% dengan koma (,) atau titik koma (;). Koma menampilkan hasil,
+%% sedangkan titik koma menyembunyikan hasil perhitungan.
+% 
+% Aturan dasar penulisan perintah:
+%% - Gunakan titik (.) sebagai pemisah desimal.
+%% - Gunakan * untuk perkalian dan ^ untuk perpangkatan.
+%% - Perpangkatan dikerjakan sebelum perkalian dan pembagian, kemudian
+% penjumlahan dan pengurangan.
+%% - Gunakan tanda kurung untuk mengatur urutan operasi.
+%% - Variabel dapat diberi nilai menggunakan = atau :=.
+%% - Komentar pada akhir baris diawali dengan //.
+>r=1.25; pi*r^2, 2*pi*r
+4.90873852123
+7.85398163397
+>
+% Argumen fungsi ditulis di dalam tanda kurung. Fungsi trigonometri
+% menggunakan radian secara default. Untuk sudut dalam derajat, gunakan
+% simbol °.
+% 
+% Contoh penggunaan fungsi matematika:
+> r := 1.25 // Menyimpan nilai r sebesar 1.25
+1.25
+% Argumen atau input untuk fungsi ditulis di dalam tanda kurung.
+>sin(45°), cos(pi), log(sqrt(E))
+0.707106781187
+-1
+0.5
+% Simbol % dapat digunakan untuk merujuk hasil perhitungan sebelumnya.
+% Contoh berikut memeriksa persamaan x^2-x-1=0.
+>(sqrt(5)+1)/2, %^2-%-1 // Memeriksa solusi x^2-x+1=0
+1.61803398875
+0
+% ** Latihan
+% 
+% - Buka menu Help -> Reference untuk menelusuri daftar fungsi
+% matematika di EMT.
+%% - Gunakan [Shift]+[Ctrl]+[Enter] untuk menyisipkan baris perintah
+% baru.
+%% - Lakukan eksplorasi perhitungan menggunakan fungsi-fungsi yang
+% tersedia.
+% 
+% ---
+% 
+% ** Satuan
+%% EMT dapat mengonversi satuan menggunakan operator ->, misalnya
+% 2.5km->miles. Satuan tambahan juga dapat didefinisikan menggunakan
+% variabel yang diakhiri tanda dolar ($).
+>2.5km -> miles
+1.55342798059
+>12inch -> " cm"
+30.48 cm
+>4km -> miles, 4inch -> " mm"
+2.48548476895
+101.6 mm
+% * Format Tampilan Nilai
+% 
+% Akurasi internal bilangan pada EMT menggunakan standar presisi ganda
+% IEEE, yaitu sekitar 16 digit EMT menggunakan presisi ganda IEEE dengan
+% akurasi sekitar 16 digit desimal. Format tampilan dapat diatur
+% menggunakan perintah short, longest, dan shortest.
+>pi
+3.14159265359
+>longest pi
+      3.141592653589793 
+>
+>short pi
+3.1416
+>shortest pi
+   3.1 
+% Perintah fraction menampilkan nilai dalam bentuk pecahan rasional.
+% Untuk bilangan irasional seperti pi, pecahan yang ditampilkan
+% merupakan pendekatan, bukan nilai eksak.
+> short 1200*1.03^10, long E, longest pi
+1612.7
+2.71828182846
+      3.141592653589793 
+% Format tampilan dapat diatur secara global menggunakan longestformat
+% dan dikembalikan ke pengaturan awal dengan defformat.
+>longestformat; pi, defformat; pi
+3.141592653589793
+3.14159265359
+>1/7+1/4, fraction %
+0.392857142857
+11/28
+% * Perintah Multibaris
+% 
+% Perintah yang panjang di EMT dapat ditulis dalam beberapa baris dengan
+% menggunakan tanda tiga titik (...) di akhir setiap baris, kecuali
+% baris terakhir. Tanda tersebut berfungsi untuk menyambungkan perintah
+% ke baris berikutnya.
+% 
+% Sebagai contoh, persamaan kuadrat \(ax^2 + bx + c = 0\) dapat
+% diselesaikan secara manual menggunakan rumus ABC melalui beberapa
+% baris perintah berikut:
+>a=4; b=15; c=2; // menyelesaikan a*x^2+b*x+c=0 secara manual ...
+>D=sqrt(b^2-4*a*c)/(2*a); ...
+>-b/(2*a) + D, ...
+>-b/(2*a) - D
+-0.138444501319
+-3.61155549868
+% * Pengelolaan variabel dan panduan fungsi
+% 
+% Perintah listvar digunakan untuk menampilkan daftar variabel
+%% yang telah didefinisikan beserta nilainya. EMT bersifat
+%% case-sensitive, sehingga huruf besar dan kecil dibedakan.
+>listvar
+r                   1.25
+a                   4
+b                   15
+c                   2
+D                   1.73655549868123
+% Untuk mencari variabel berdasarkan pola nama, gunakan
+%% listvar diikuti pola teks. Perintah remvalue digunakan
+%% untuk menghapus variabel tertentu.
+>listvar m$
+km$                 1000
+cm$                 0.01
+mm$                 0.001
+nm$                 1853.24496
+gram$               0.001
+m$                  1
+hquantum$           6.62606957e-34
+atm$                101325
+>remvalue a,b,c,D
+% Panduan fungsi dapat dibuka dengan menekan [F1] atau mengklik dua kali
+% nama fungsi pada lembar kerja.
+%% Berikut contoh fungsi untuk menghasilkan bilangan acak.
+>intrandom(10,6)
+[4,  2,  6,  2,  4,  2,  3,  2,  2,  6]
+>random(10)
+[0.270906,  0.704419,  0.217693,  0.445363,  0.308411,  0.914541,  0.193585,
+0.463387,  0.095153,  0.595017]
+>normal(10)
+[-0.495418,  1.6463,  -0.390056,  -1.98151,  3.44132,  0.308178,  -0.733427,
+-0.526167,  1.10018,  0.108453]
+% * Matriks dan Vektor
+% 
+% Euler Math Toolbox (EMT) dirancang berbasis bahasa matriks sehingga
+% sangat andal untuk perhitungan aljabar linear, statistika, dan
+% optimisasi. Vektor dan matriks didefinisikan menggunakan tanda kurung
+% siku [...]. Elemen dalam satu baris dipisahkan dengan koma (,),
+% sedangkan elemen antarbaris dipisahkan dengan titik koma (;).
+>v=[4,5,6,3,2,1]
+[4,  5,  6,  3,  2,  1]
+>A=[1,2,3;4,5,6;7,8,9]
+            1             2             3 
+            4             5             6 
+            7             8             9 
+% Selain itu, vektor juga dapat dibuat secara cepat menggunakan rentang
+% nilai dengan operator titik dua (`:`), baik dengan interval 1 maupun
+% interval kustom:
+>c=1:5
+[1,  2,  3,  4,  5]
+>w=0:0.1:1
+[0,  0.1,  0.2,  0.3,  0.4,  0.5,  0.6,  0.7,  0.8,  0.9,  1]
+>mean(w^2)
+0.35
+% Beberapa fungsi dasar untuk mengolah bilangan kompleks meliputi:
+%% - re(x): mengambil bagian riil dari bilangan kompleks \(x\).
+%% - im(x): mengambil bagian imajiner dari bilangan kompleks \(x\).
+%% - complex(x): mengubah bilangan riil \(x\) menjadi bilangan kompleks.
+%% - conj(x): menentukan konjugat dari bilangan kompleks \(x\).
+%% - arg(x): menentukan argumen atau sudut bilangan kompleks dalam
+% radian.
+% 
+% Sebagai contoh, berikut adalah operasi bilangan kompleks beserta
+% konversi sudutnya ke derajat:
+>z=2+3*I, re(z), im(z), conj(z), arg(z), deg(arg(z)), deg(arctan(3/2))
+2+3i
+2
+3
+2-3i
+0.982793723247
+56.309932474
+56.309932474
+>deg(arg(I)) // 90°
+90
+>sqrt(-1)
+Floating point error!
+Error in sqrt
+Error in:
+sqrt(-1) ...
+        ^
+>sqrt(complex(-1))
+0+1i
+>complex(-1), sqrt(%)
+-1+0i 
+0+1i
+% * Matematika Simbolik
+% 
+% Euler Math Toolbox (EMT) dapat melakukan perhitungan matematika
+% simbolik secara eksak dengan bantuan perangkat lunak Maxima yang telah
+% terintegrasi di dalamnya. Untuk menjalankan perhitungan simbolik, kita
+% cukup mengawali perintah dengan tanda ampersand (&).
+>&(a+b)^2
+
+                                           2
+                                    (b + a)
+
+>&expand((a+b)^2), &factor(x^2+5*x+6)
+
+                                  2            2
+                                 b  + 2 a b + a
+
+
+                                 (x + 2) (x + 3)
+
+>&solve(a*x^2+b*x+c,x) // rumus abc
+
+                          2                          2
+                 (- sqrt(b  - 4 a c)) - b      sqrt(b  - 4 a c) - b
+            [x = ------------------------, x = --------------------]
+                           2 a                         2 a
+
+>&(a^2-b^2)/(a+b), &ratsimp(%) // ratsimp menyederhanakan bentuk pecahan
+
+                                      2    2
+                                     a  - b
+                                     -------
+                                      b + a
+
+
+                                      a - b
+
+>10! // nilai faktorial (modus EMT)
+3628800
+>&10! //nilai faktorial (simbolik dengan Maxima)
+
+                                     3628800
+
+>factor(1000) // faktorisasi prima 1000 dalam bentuk daftar faktor (EMT)
+[2,  2,  2,  5,  5,  5]
+% Kita juga dapat menyelesaikan persamaan aljabar, menyederhanakan
+% pecahan menggunakan perintah `ratsimp`, atau mencari nilai faktorial
+% secara simbolik:
+>
+>:: factor(1000) // faktorisasi prima 1000 (dengan Maxima) 
+
+                                 3  3
+                                2  5
+
+>:: factor(20!)
+
+                             18  8  4  2
+                            2   3  5  7  11 13 17 19
+
+% Perintah Maxima lanjutan dapat digunakan dengan mengawali tanda `::`
+% (modus kompatibilitas EMT) atau `:::` (sintaks asli Maxima dengan
+% spasi):
+>::: binomial(5,2); // nilai C(5,2)
+
+                                       10
+
+>::: binomial(m,4); // C(m,4)=m!/(4!(m-4)!)
+
+                            (m - 3) (m - 2) (m - 1) m
+                            -------------------------
+                                       24
+
+>::: trigexpand(cos(x+y)); // rumus cos(x+y)=cos(x) cos(y)-sin(x)sin(y) 
+
+                          cos(x) cos(y) - sin(x) sin(y)
+
+>::: trigexpand(sin(x+y));
+
+                          cos(x) sin(y) + sin(x) cos(y)
+
+>::: trigsimp(((1-sin(x)^2)*cos(x))/cos(x)^2+tan(x)*sec(x)^2) //menyederhanakan fungsi trigonometri
+
+                                            4
+                                sin(x) + cos (x)
+                                ----------------
+                                       3
+                                    cos (x)
+
+% Ekspresi simbolik dapat disimpan ke dalam suatu variabel menggunakan
+% tanda `&=`, kemudian dimanipulasi lebih lanjut untuk substitusi nilai,
+% turunan (`diff`), maupun integral (`integrate`):
+>p1 &= (x^3+1)/(x+1)
+
+                                      3
+                                     x  + 1
+                                     ------
+                                     x + 1
+
+>&ratsimp(p1)
+
+                                    2
+                                   x  - x + 1
+
+% Untuk mensubstitusikan suatu nilai ke dalam variabel dapat digunakan perintah
+% "with".
+>&p1 with x=3 // (3^3+1)/(3+1)
+
+                                        7
+
+>&p1 with x=a+b, &ratsimp(%) //substitusi dengan variabel baru
+
+                                         3
+                                  (b + a)  + 1
+                                  ------------
+                                   b + a + 1
+
+
+                           2                  2
+                          b  + (2 a - 1) b + a  - a + 1
+
+>&diff(p1,x) //turunan p1 terhadap x
+
+                                   2      3
+                                3 x      x  + 1
+                                ----- - --------
+                                x + 1          2
+                                        (x + 1)
+
+>&integrate(p1,x) // integral p1 terhadap x
+
+                                   3      2
+                                2 x  - 3 x  + 6 x
+                                -----------------
+                                        6
+
+% * Tampilan Matematika Simbolik dengan LaTeX
+% 
+% EMT dapat menampilkan hasil perhitungan simbolik dalam bentuk rumus
+% yang lebih rapi menggunakan LaTeX. Caranya adalah dengan menambahkan
+% tanda dolar ($) tepat sebelum tanda & pada baris perintah. Fitur ini
+% memerlukan kompilator LaTeX yang telah terpasang dan dikonfigurasi.
+%% Contoh:
+>$&expand((a+b)^2), $&factor(x^2+5*x+6)
+>$&solve(a*x^2+b*x+c,x) // rumus abc
+>$&(a^2-b^2)/(a+b), $&ratsimp(%)
+% 
+% 
+% * Selamat Belajar dan Berlatih!
+% 
+% Demikian pengantar singkat penggunaan Euler Math Toolbox (EMT).
+%% Masih banyak fitur EMT yang dapat dipelajari dan dipraktikkan.
+%% Untuk memperdalam pemahaman, lakukan latihan berikut:
+% 
+% - Carilah soal matematika dari buku atau sumber belajar lainnya.
+%% - Tambahkan beberapa perintah EMT pada notebook ini.
+%% - Selesaikan soal tersebut menggunakan perintah yang telah dipelajari.
+% 
+% Pilih soal yang sesuai dengan materi dan contoh yang telah
+%% dibahas, kemudian periksa kembali hasil perhitungannya.
+% 
+% ** Latihan 1
+% 
+% Soal 1
+% 
+% Sumber: Cynthia Y. Young, Algebra and Trigonometry, 4th Edition,
+% bagian Chapter 0 Review Exercises — 0.1 Real Numbers, soal nomor 3.
+% 
+% Simplify
+%%  7 - 2 . 5 + 4 . 3 - 5
+% 
+% Sederhanakan bentuk matematika berikut.
+%%  7 - 2 * 5 + 4 * 3 - 5
+>7-2*5+4*3-5  
+4
+>
+% 
+% Soal 2
+% 
+% Simplify
+%% \(\dfrac{(16x^3y)^{1/2}}{(27x^2y^3)^{1/3}}\)
+%% and write your answer with only positive exponents.
+% 
+% penyelesaian:
+%% Menyimpan bentuk awal secara simbolik
+> f &= (16*x^3*y)^(1/2)/(27*x^2*y^3)^(1/3)
+
+                                  5/6
+                               4 x
+                              ---------
+                              3 sqrt(y)
+
+% Menyederhanakan bentuk simbolik
+>&radcan(f)
+
+                                  5/6
+                               4 x
+                              ---------
+                              3 sqrt(y)
+
+% Menyederhanakan bentuk simbolik
+> x=2; y=3
+3
+% Membandingkan bentuk awal dengan bentuk sederhana
+> [(16*x^3*y)^(1/2)/(27*x^2*y^3)^(1/3), 4*x^(5/6)/(3*y^(1/2))]
+[1.37163,  1.37163]
+% 
+% 
+% 
+% Soal 3
+% 
+% For
+%% \(j(x)=(x^2+2)(3x^3-5x)\), find \(j'(x)\)
+%% by applying the product rule. Check the result by first finding the
+% product and then differentiating
+% 
+% Gilbert Strang dan Edwin Herman, Calculus Volume 1, Section 3.3,
+% Example 3.24, OpenStax
+% 
+% Penyelesaian:
+%% Mendefinisikan fungsi secara simbolik
+>j &= (x^2+2)*(3*x^3-5*x)
+
+                          2          3
+                        (x  + 2) (3 x  - 5 x)
+
+% Menghitung turunan menggunakan Maxima
+>dj &= diff(j,x)
+
+                        3            2          2
+                2 x (3 x  - 5 x) + (x  + 2) (9 x  - 5)
+
+% Menyederhanakan hasil turunan
+>&expand(dj)
+
+                              4      2
+                          15 x  + 3 x  - 10
+
+% Mengalikan faktor terlebih dahulu
+>&expand(j)
+
+                              5    3
+                           3 x  + x  - 10 x
+
+% Menurunkan bentuk hasil perkalian
+>&diff(expand(j),x)
+
+                              4      2
+                          15 x  + 3 x  - 10
+
+% Memeriksa nilai turunan pada x=2
+>&subst(x=2,dj)
+
+                                 242
+
+>

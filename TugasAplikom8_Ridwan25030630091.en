@@ -1,0 +1,1136 @@
+﻿% * Statistika dengan Euler Math Toolbox (EMT)
+% 
+% Nama  : Ridwan Maulana
+%% NIM   : 25030630091
+%% Kelas : Matematika F
+% 
+% Catatan ini membahas penggunaan Euler Math Toolbox (EMT) untuk
+% mengolah dan menganalisis data statistika. Materi yang dibahas
+% meliputi penyimpanan data, simulasi, pembacaan file, statistika
+% deskriptif, penyajian grafik, dan pengujian hipotesis. Setiap bagian
+% dilengkapi dengan penjelasan konsep serta contoh penggunaan perintah
+% EMT. Penyusunan materi mengacu pada notebook EMT4Statistika dari dosen
+% dengan tetap mempertahankan urutan pembahasannya. Pada bagian akhir,
+% terdapat analisis data dan lima soal latihan beserta penyelesaiannya.
+% 
+% * Cara Menggunakan Notebook
+% 
+% Jalankan perintah EMT yang diawali tanda > secara berurutan, mulai
+% dari bagian awal. Beberapa perintah membutuhkan file data seperti
+% table.dat, table1.dat, excel-data.csv, dan sample.csv, sehingga file
+% tersebut perlu tersedia di folder kerja EMT. Pada bagian simulasi,
+% hasil yang muncul dapat berbeda setiap kali perintah dijalankan.
+% Ulangi perintah tersebut untuk mengamati perubahan hasilnya.
+% 
+% * Pengantar Statistika
+% 
+% Statistika digunakan untuk mengolah data agar informasi di dalamnya
+% lebih mudah dipahami dan dapat digunakan sebagai dasar pengambilan
+% kesimpulan. Secara umum, pengolahan data dapat dilakukan dengan:
+%% - Mengumpulkan data melalui survei, pengukuran, atau simulasi.
+%% - Merangkum data menggunakan rata-rata, median, simpangan baku, dan
+% grafik.
+%% - Mengamati pola atau hubungan yang terdapat dalam data.
+%% - Melakukan pengujian statistika untuk menilai suatu dugaan
+% berdasarkan data yang diperoleh.
+% 
+% EMT membantu proses tersebut melalui berbagai perintah pengolahan dan
+% analisis data.
+% 
+% ** Beberapa istilah dasar yang digunakan dalam pembahasan:
+% 
+% - Rata-rata: jumlah seluruh nilai dibagi banyaknya data.
+%% - Median: nilai tengah setelah data diurutkan.
+%% - Simpangan baku: ukuran yang menunjukkan tingkat penyebaran data
+% terhadap rata-ratanya.
+%% - Nilai-p: peluang memperoleh hasil yang sama ekstrem atau lebih
+% ekstrem daripada hasil pengamatan, jika hipotesis nol benar.
+% 
+% * 1. Data dan Statistika Deskriptif
+% 
+% ** Arti konsep
+% 
+% Data disimpan sebagai vektor (satu baris angka) atau matriks (baris =
+% pengamatan, kolom = variabel). Ukuran pemusatan menjawab "angka yang
+% mewakili data itu berapa", yaitu rata-rata dan median. Ukuran sebaran
+% menjawab "seberapa beragam datanya", yaitu simpangan baku (pembagi
+% n-1) dan kuartil.
+% 
+% ** Contoh dunia nyata
+% 
+% Gaji lima karyawan: 4, 4, 5, 5, dan 100 juta rupiah. Rata-ratanya 23,6
+% juta, padahal hampir semua orang bergaji 4 sampai 5 juta. Median 5
+% juta lebih jujur menggambarkan gaji yang umum. Jadi rata-rata mudah
+% terseret nilai ekstrem, sedangkan median tidak. Dalam praktik,
+% keduanya dilihat bersama.
+% 
+% ** Praktik di EMT
+% 
+% Tujuan: meringkas sepuluh hasil penimbangan bungkus gula yang
+% seharusnya 1000 gram.
+% 
+% Langkah 1. Simpan data sebagai vektor, lalu hitung median, rata-rata,
+% dan simpangan baku.
+>M=[1000,1004,998,997,1002,1001,998,1004,998,997]; ...
+>median(M), mean(M), dev(M),
+999
+999.9
+2.7264
+% Hasil: median 999, rata-rata 999,9, simpangan baku 2,73. Data berkumpul di sekitar 1000
+% dan menyimpang rata-rata sekitar 2,73 gram. Pabrik memakai angka seperti ini untuk
+% menilai apakah mesin pengemas masih akurat.
+% 
+% Langkah 2. Kuartil Q1, Q2 (median), dan Q3 diambil dengan parameter p. Seperempat data
+% berada di bawah Q1 dan tiga perempat di bawah Q3.
+>median(M,p=[0.25,0.5,0.75])
+[998,  999,  1001.8]
+% 
+% Langkah 3. Diagram kotak (box-and-whiskers) merangkum nilai minimum, Q1, median, Q3, dan
+% maksimum. Pada data ini tidak ada pencilan (outlier).
+>aspect(1.75); boxplot(M):
+ %image% TugasAplikom8_Ridwan25030630091-001.png
+% 
+% Langkah 4. Hitung peluang nilai lebih dari 1005, dengan anggapan data berasal dari
+% distribusi normal. Semua fungsi distribusi di Euler berakhiran "dis" dan menghitung
+% fungsi distribusi kumulatif (peluang X <= x):
+% latex: \text{normaldis}(x,m,d)=\int_{-\infty}^x \frac{1}{d\sqrt{2\pi}}e^{-\frac{1}{2}\left(\frac{t-m}{d}\right)^2}\,dt
+% Hasilnya dicetak dalam persen dengan dua angka desimal memakai fungsi print.
+>print((1-normaldis(1005,mean(M),dev(M)))*100,2,unit=" %")
+      3.07 %
+% Hasilnya 3,07 %. Dari 100 bungkus, sekitar 3 bungkus diperkirakan lebih dari 1005 gram.
+% Catatan kritis: PDF dosen memakai gprint dan menampilkan galat "Function gprint not
+% found". Pada notebook (.en) perintahnya print, dan ini yang berjalan. Hasil ini hanya
+% sahih jika data memang mendekati normal, padahal sampelnya hanya sepuluh.
+% 
+% ** Distribusi frekuensi
+% 
+% Jika datanya ratusan, angka mentah sulit dibaca, jadi data dikelompokkan ke dalam
+% rentang (kelas). Misalkan banyak laki-laki pada tiap rentang tinggi badan adalah sebagai
+% berikut (r = batas kelas, v = frekuensi).
+>r=155.5:4:187.5; v=[22,71,136,169,139,71,32,8];
+% Histogram dari data tersebut:
+>plot2d(r,v,a=150,b=200,c=0,d=190,bar=1,style="\/"):
+ %image% TugasAplikom8_Ridwan25030630091-002.png
+% 
+% Data itu dimasukkan ke dalam tabel. Tabel adalah cara menyimpan data statistika. Tabel ini
+% punya tiga kolom: batas bawah (BB), batas atas (BA), dan frekuensi (Frek). Tanda "|"
+% memisahkan kolom, dan opsi labc pada writetable menentukan judul kolom.
+>T:=r[1:8]' | r[2:9]' | v'; writetable(T,labc=["BB","BA","Frek"])
+        BB        BA      Frek
+     155.5     159.5        22
+     159.5     163.5        71
+     163.5     167.5       136
+     167.5     171.5       169
+     171.5     175.5       139
+     175.5     179.5        71
+     179.5     183.5        32
+     183.5     187.5         8
+% 
+% Untuk menghitung rata-rata dan sebaran, dibutuhkan titik tengah tiap kelas. Dengan dua
+% kolom pertama tabel:
+>(T[,1]+T[,2])/2 // titik tengah tiap kelas
+    157.5 
+    161.5 
+    165.5 
+    169.5 
+    173.5 
+    177.5 
+    181.5 
+    185.5 
+% Cara yang lebih singkat adalah melipat vektor r dengan [1/2,1/2]:
+>M=fold(r,[0.5,0.5])
+[157.5,  161.5,  165.5,  169.5,  173.5,  177.5,  181.5,  185.5]
+% Rata-rata dan simpangan baku sampel dengan frekuensi v:
+>{m,d}=meandev(M,v); m, d,
+169.9
+5.9891
+% Hasilnya rata-rata 169,90 dan simpangan baku 5,99 dari 648 orang.
+% 
+% Kurva kerapatan normal dengan rata-rata m dan simpangan baku d memakai rumus
+% latex: y=\frac{1}{d\sqrt{2\pi}}e^{-\frac{(x-m)^2}{2d^2}}
+% Nilainya antara 0 dan 1, sehingga untuk ditumpuk pada histogram perlu dikali jumlah data
+% dan lebar kelas (4).
+>plot2d("qnormal(x,m,d)*sum(v)*4", ...
+>  xmin=min(r),xmax=max(r),thickness=3,add=1):
+ %image% TugasAplikom8_Ridwan25030630091-003.png
+% Kurva mengikuti bentuk histogram, jadi tinggi badan kira-kira berdistribusi normal.
+% Contoh nyata: toko pakaian memakai pola ini untuk menentukan berapa banyak ukuran S, M,
+% dan L yang perlu diproduksi.
+% 
+% * 2. Tabel
+% 
+% ** Arti konsep
+% 
+% Data nyata biasanya tersimpan di file berupa tabel (hasil survei, ekspor Excel, dan
+% sebagainya). EMT dapat membacanya sebagai tabel (frame data), sehingga tidak perlu
+% diketik ulang. Kolom berisi huruf (misalnya "m" dan "f") dipetakan ke angka, yang disebut
+% token.
+% 
+% ** Contoh dunia nyata
+% 
+% Dinas pendidikan menyimpan nilai ribuan siswa di Excel. Dengan membaca file tabel di EMT,
+% rata-rata dan grafiknya dapat dihitung langsung tanpa mengetik satu per satu.
+% 
+% ** Praktik di EMT
+% 
+% Pada folder notebook ini ada file table.dat. Isinya hasil survei 25 orang dari buku
+% berbahasa Jerman "EinfÃ¼hrung in die Statistik mit R" karya A. Handl. Empat baris pertama:
+>printfile("table.dat",4);
+Person Sex Age Titanic Evaluation Tip Problem
+1 m 30 n . 1.80 n
+2 f 23 y g 1.80 n
+3 f 26 y g 1.80 y
+% Tabel punya 7 kolom: Person, Sex, Age, Titanic, Evaluation, Tip, Problem. Kolom bertanda
+% huruf perlu diterjemahkan ke angka. Mula-mula saya mendefinisikan himpunan token sendiri.
+% Fungsi strtokens() mengubah string menjadi vektor token.
+>mf:=["m","f"]; yn:=["y","n"]; ev:=strtokens("g vg m b vb");
+% Tabel dibaca dengan terjemahan tersebut. Argumen tok2, tok4, dan seterusnya bukan bagian
+% dari daftar parameter readtable(), jadi harus diberikan dengan ":=".
+>{MT,hd}=readtable("table.dat",tok2:=mf,tok4:=yn,tok5:=ev,tok7:=yn);
+>load over statistics;
+% Untuk mencetak, himpunan token yang sama harus disebutkan lagi. Di sini hanya 10 baris
+% pertama yang dicetak.
+>writetable(MT[1:10],labc=hd,wc=5,tok2:=mf,tok4:=yn,tok5:=ev,tok7:=yn);
+ Person  Sex  Age Titanic Evaluation  Tip Problem
+      1    m   30       n          .  1.8       n
+      2    f   23       y          g  1.8       n
+      3    f   26       y          g  1.8       y
+      4    m   33       n          .  2.8       n
+      5    m   37       n          .  1.8       n
+      6    m   28       y          g  2.8       y
+      7    f   31       y         vg  2.8       n
+      8    m   23       n          .  0.8       n
+      9    f   24       y         vg  1.8       y
+     10    m   26       n          .  1.8       n
+% Tanda titik "." menyatakan data yang tidak tersedia (not available).
+% 
+% Jika himpunan token tidak mau ditentukan sendiri, cukup sebutkan kolom mana yang berisi
+% token, dan readtable() akan mengembalikan himpunan token yang ditemukan.
+>ctok=[2,4,5,7]; {MT,hd,tok}=readtable("table.dat",ctok=ctok);
+>tok
+m
+n
+f
+y
+g
+vg
+% Tabel kini berisi angka hasil terjemahan token. Nilai khusus "." diperlakukan sebagai
+% NAN (bukan angka). Terjemahan ini dapat diubah dengan parameter NA dan NAval.
+>MT[1]
+[1,  1,  30,  2,  NAN,  1.8,  2]
+% Isi tabel dengan angka mentah (belum diterjemahkan kembali):
+>writetable(MT,wc=5)
+    1    1   30    2    .  1.8    2
+    2    3   23    4    5  1.8    2
+    3    3   26    4    5  1.8    4
+    4    1   33    2    .  2.8    2
+    5    1   37    2    .  1.8    2
+    6    1   28    4    5  2.8    4
+    7    3   31    4    6  2.8    2
+    8    1   23    2    .  0.8    2
+    9    3   24    4    6  1.8    4
+   10    1   26    2    .  1.8    2
+   11    3   23    4    6  1.8    4
+   12    1   32    4    5  1.8    2
+   13    1   29    4    6  1.8    4
+   14    3   25    4    5  1.8    4
+   15    3   31    4    5  0.8    2
+   16    1   26    4    5  2.8    2
+   17    1   37    2    .  3.8    2
+   18    1   38    4    5    .    2
+   19    3   29    2    .  3.8    2
+   20    3   28    4    6  1.8    2
+   21    3   28    4    1  2.8    4
+   22    3   28    4    6  1.8    4
+   23    3   38    4    5  2.8    2
+   24    3   27    4    1  1.8    4
+   25    1   27    2    .  2.8    4
+% Rata-rata satu kolom (misalnya Tip, kolom ke-6) dapat dihitung langsung:
+>mean(tablecol(MT,6))
+2.175
+% Rata-rata tip adalah 2,175. Baris yang bertanda "." dilewati oleh tablecol.
+% 
+% Fungsi getstatistics() mengembalikan unsur-unsur berbeda dalam sebuah vektor beserta
+% banyaknya. Di sini dipakai pada kolom ke-2 (jenis kelamin):
+>{xu,count}=getstatistics(tablecol(MT,2)); xu, count,
+[1,  3]
+[12,  13]
+>writetable(count',labr=tok[xu])
+         m        12
+         f        13
+% Laki-laki (m) 12 orang dan perempuan (f) 13 orang.
+% 
+% Dengan getstatistics() dua kolom, banyaknya setiap kombinasi dapat dihitung:
+>MT24=tablecol(MT,[2,4]); ...
+>{xu1,xu2,count}=getstatistics(MT24[1],MT24[2]); ...
+>writetable(count,labr=tok[xu1],labc=tok[xu2])
+                   n         y
+         m         7         5
+         f         1        12
+% Dari 13 perempuan, 12 menjawab y (sudah menonton atau mengenal Titanic). Dari 12
+% laki-laki, hanya 5 yang menjawab y.
+% 
+% Uji lanjutan (tambahan dari saya): apakah jawaban Titanic bergantung pada jenis kelamin?
+% H0: kedua hal itu saling bebas. Tabel frekuensi harapan dilihat dulu:
+>writetable(expectedtable(count),wc=8,dc=2,labr=tok[xu1],labc=tok[xu2])
+               n       y
+       m    3.84    8.16
+       f    4.16    8.84
+>tabletest(count)
+0.0066909
+% Nilai-p sekitar 0,0067 < 0,05 (dihitung ulang di luar EMT dengan uji chi-kuadrat
+% Pearson), jadi H0 ditolak. Catatan kritis: dua dari empat sel punya frekuensi harapan
+% di bawah 5 (3,84 dan 4,16). Pada kondisi itu aproksimasi chi-kuadrat kurang andal, dan
+% uji eksak Fisher lebih tepat (nilai-p sekitar 0,011, hasilnya tetap menolak H0). Jadi
+% kesimpulannya sama, tetapi sampel 25 orang membuat dugaan ini perlu dibaca hati-hati.
+% 
+% Tabel dapat ditulis ke berkas, lalu dibaca kembali.
+>filename="test.dat"; ...
+>writetable(count,labr=tok[xu1],labc=tok[xu2],file=filename);
+>{MT2,hd2,tk2,hdr}=readtable(filename,>clabs,>rlabs); ...
+>writetable(MT2,labr=hdr,labc=hd2)
+                   n         y
+         m         7         5
+         f         1        12
+% Terakhir, berkas dihapus.
+>fileremove(filename);
+% 
+% * 3. Distribusi
+% 
+% ** Arti konsep
+% 
+% Distribusi menggambarkan nilai apa saja yang mungkin muncul dan seberapa sering tiap nilai
+% muncul. Data hasil simulasi (acak) mengikuti distribusi yang dipilih. Hasilnya berbeda tiap
+% pengulangan, tetapi polanya tetap. Makin banyak data, makin jelas polanya.
+% 
+% ** Contoh dunia nyata
+% 
+% Sebelum membuka gerai, pemilik usaha dapat mensimulasikan jumlah pelanggan per jam untuk
+% menebak kapan antrean paling panjang, tanpa harus mencoba langsung. Simulasi murah dan aman
+% untuk berlatih sebelum keputusan nyata.
+% 
+% ** Praktik di EMT
+% 
+% Langkah 1. Dengan plot2d tersedia cara mudah menggambar distribusi data hasil percobaan.
+% Berikut 1000 data acak berdistribusi normal, histogram dengan 20 kelas, dan kurva normal
+% baku di atasnya.
+>p=normal(1,1000); //sampel p: 1000 data acak berdistribusi normal
+>plot2d(p,distribution=20,style="\/"); // gambar sampel p
+>plot2d("qnormal(x,0,1)",add=1): // tambahkan kurva normal baku
+ %image% TugasAplikom8_Ridwan25030630091-004.png
+% Perhatikan perbedaan antara batang (sampel) dan kurva (distribusi sebenarnya). Tekan ENTER
+% pada ketiga perintah itu sekali lagi untuk melihat hasil sampel yang lain.
+% 
+% Langkah 2. Perbandingan 10 simulasi masing-masing 1000 data normal dengan diagram kotak.
+% Diagram ini menunjukkan median, kuartil 25 % dan 75 %, nilai minimum dan maksimum, serta
+% pencilan.
+>p=normal(10,1000); boxplot(p):
+ %image% TugasAplikom8_Ridwan25030630091-005.png
+% 
+% Langkah 3. Bilangan bulat acak dibangkitkan dengan intrandom. Berikut simulasi pelemparan
+% dadu 6000 kali. Fungsi getmultiplicities(v,x) menghitung berapa kali unsur v muncul dalam
+% x, lalu hasilnya digambar dengan columnsplot(). Tiap sisi seharusnya muncul sekitar 1000
+% kali (garis merah).
+>k=intrandom(1,6000,6);  ...
+>columnsplot(getmultiplicities(1:6,k));  ...
+>ygrid(1000,color=red):
+ %image% TugasAplikom8_Ridwan25030630091-006.png
+% 
+% Langkah 4. Distribusi eksponensial. Peubah acak kontinu X berdistribusi eksponensial bila
+% fungsi kerapatannya
+% latex: f_X(x)=\lambda e^{-\lambda x},\quad x>0,\quad \lambda>0,
+% dengan parameter
+% latex: \lambda=\frac{1}{\mu},\quad \mu \text{ adalah rata-rata, ditulis } X \sim \text{Exponential}(\lambda).
+% Berikut data acak eksponensial dengan rata-rata 2 (cocok untuk waktu tunggu, misalnya
+% selang waktu antar pelanggan yang datang).
+>plot2d(randexponential(1,1000,2),>distribution):
+ %image% TugasAplikom8_Ridwan25030630091-007.png
+% Data menumpuk di dekat 0 lalu menurun ke kanan, ciri distribusi eksponensial.
+% 
+% Langkah 5. Untuk banyak distribusi, Euler dapat menghitung fungsi distribusi dan
+% inversnya. Kurva fungsi distribusi kumulatif normal baku:
+>plot2d("normaldis",-4,4):
+ %image% TugasAplikom8_Ridwan25030630091-008.png
+% Kurva naik dari 0 ke 1 dan bernilai 0,5 di x = 0.
+% 
+% Langkah 6. Peluang sama dengan luas daerah di bawah kurva kerapatan. Daerah yang diarsir
+% adalah P(2 < X < 5) untuk X normal dengan rata-rata 1 dan simpangan baku 1,5.
+>plot2d("qnormal(x,1,1.5)",-4,6);  ...
+>plot2d("qnormal(x,1,1.5)",a=2,b=5,>add,>filled):
+ %image% TugasAplikom8_Ridwan25030630091-009.png
+>normaldis(5,1,1.5)-normaldis(2,1,1.5)
+0.24866
+% Peluangnya 0,2487, yaitu sekitar 24,9 %. Nilai yang sama diperoleh dari integral
+% latex: \int_2^5 \frac{1}{1.5\sqrt{2\pi}}e^{-\frac{1}{2}\left(\frac{x-1}{1.5}\right)^2}\,dx
+>gauss("qnormal(x,1,1.5)",2,5)
+0.24866
+% 
+% * 4. Distribusi Diskret
+% 
+% ** Arti konsep
+% 
+% Distribusi diskret memberi peluang pada nilai-nilai yang dapat dihitung (misalnya 1 sampai
+% 6 pada dadu). Euler memungkinkan distribusi diskret buatan sendiri, dan menyediakan
+% distribusi binomial, hipergeometrik, dan multinomial.
+% 
+% ** Contoh dunia nyata
+% 
+% Mesin undian yang dicurigai berat sebelah: dengan simulasi dan uji sederhana, kecurangan
+% sekecil apa pun dapat dideteksi bila percobaannya cukup banyak.
+% 
+% ** Praktik di EMT
+% 
+% Langkah 1. Distribusi binomial. bindis() memberi peluang paling banyak i keberhasilan dari
+% n percobaan.
+>bindis(410,1000,0.4)
+0.7514
+% Selang kepercayaan Clopper-Pearson untuk parameter p memakai invers fungsi Beta. Artinya,
+% jika p di luar selang itu, hasil pengamatan 410 dari 1000 termasuk langka.
+>clopperpearson(410,1000)
+[0.37932,  0.44121]
+% Cara langsung berikut memberi hasil yang sama, tetapi untuk n besar penjumlahan langsung
+% tidak teliti dan lambat.
+>p=0.4; i=0:410; n=1000; sum(bin(n,i)*p^i*(1-p)^(n-i))
+0.7514
+% invbindis() menghitung invers dari bindis().
+>invbindis(0.75,1000,0.4)
+409.93
+% 
+% Langkah 2. Pada permainan bridge, ada 5 kartu tersisa (dari 52) pada dua tangan (26
+% kartu). Peluang pembagian yang lebih buruk daripada 3:2 (misalnya 0:5, 1:4, 4:1, atau 5:0):
+>2*hypergeomsum(1,5,13,26)
+0.32174
+% Peluangnya 0,3217, yaitu sekitar 32 %.
+% 
+% Langkah 3. Simulasi distribusi multinomial: 10 baris, masing-masing 1000 percobaan dengan
+% peluang 0,4; 0,1; dan 0,5.
+>randmultinomial(10,1000,[0.4,0.1,0.5])
+      390       124       486 
+      394        92       514 
+      402       135       463 
+      399       101       500 
+      418        93       489 
+      398       102       500 
+      393       100       507 
+      387        92       521 
+      414       102       484 
+      413        94       493 
+% Kolom-kolomnya berkisar di sekitar 400, 100, dan 500.
+% 
+% * 5. Menggambar Data
+% 
+% ** Arti konsep
+% 
+% Grafik membuat pola terlihat sekilas. Pilihannya bergantung pada pertanyaan: diagram
+% batang untuk membandingkan jumlah, diagram lingkaran untuk bagian terhadap keseluruhan,
+% garis untuk perubahan dari waktu ke waktu, titik (sebar) untuk hubungan dua variabel, dan
+% histogram untuk bentuk sebaran.
+% 
+% ** Contoh dunia nyata
+% 
+% Hasil pemilu ditampilkan dengan diagram batang (siapa unggul) dan diagram lingkaran (berapa
+% persen suara tiap partai). Data yang dipakai adalah hasil pemilu parlemen Jerman sejak 1990
+% dalam jumlah kursi (dari notebook dosen). Kolom: tahun, jumlah kursi seluruhnya, lalu kursi
+% CDU/CSU, SPD, FDP, Gr (Hijau), dan Li (Kiri).
+% 
+% ** Praktik di EMT
+% 
+>BW := [ ...
+>1990,662,319,239,79,8,17; ...
+>1994,672,294,252,47,49,30; ...
+>1998,669,245,298,43,47,36; ...
+>2002,603,248,251,47,55,2; ...
+>2005,614,226,222,61,51,54; ...
+>2009,622,239,146,93,68,76; ...
+>2013,631,311,193,0,63,64];
+% Nama partai disimpan sebagai vektor string:
+>P:=["CDU/CSU","SPD","FDP","Gr","Li"];
+% Persentase dicetak rapi. Kolom 3 sampai 7 adalah kursi tiap partai, kolom 2 jumlah seluruh
+% kursi, dan kolom 1 tahun pemilu.
+>BT:=BW[,3:7]; BT:=BT/sum(BT); YT:=BW[,1]';
+% Tabel statistik dicetak dengan nama partai sebagai judul kolom dan tahun sebagai judul
+% baris. Lebar kolom bawaan wc=10 diperkecil agar lebih padat.
+>writetable(BT*100,wc=6,dc=0,>fixed,labc=P,labr=YT)
+       CDU/CSU   SPD   FDP    Gr    Li
+  1990      48    36    12     1     3
+  1994      44    38     7     7     4
+  1998      37    45     6     7     5
+  2002      41    42     8     9     0
+  2005      37    36    10     8     9
+  2009      38    23    15    11    12
+  2013      49    31     0    10    10
+% Perkalian matriks berikut menjumlahkan persentase dua partai besar. Hasilnya menunjukkan
+% partai kecil makin berpengaruh sampai 2009.
+>BT1:=(BT.[1;1;0;0;0])'*100
+[84.29,  81.25,  81.166,  82.753,  72.964,  61.897,  79.873]
+% Grafik statistik sederhana untuk garis dan titik sekaligus. Alternatifnya, memanggil plot2d
+% dua kali dengan >add.
+>statplot(YT,BT1,"b"):
+ %image% TugasAplikom8_Ridwan25030630091-010.png
+% Warna tiap partai ditetapkan lebih dulu:
+>CP:=[rgb(0.5,0.5,0.5),red,yellow,green,rgb(0.8,0,0)];
+% Diagram batang perolehan kursi tiap partai pada pemilu 2009:
+>columnsplot(BW[6,3:7],P,color=CP):
+ %image% TugasAplikom8_Ridwan25030630091-011.png
+% Diagram lingkaran. Karena hitam dan kuning berkoalisi, urutannya disusun ulang.
+>i=[1,3,5,4,2]; piechart(BW[6,3:7][i],color=CP[i],lab=P[i]):
+ %image% TugasAplikom8_Ridwan25030630091-012.png
+% Diagram bintang menampilkan tiap nilai sebagai sinar dari pusat (data acak):
+>starplot(normal(1,10)+4,lab=1:10,>rays):
+ %image% TugasAplikom8_Ridwan25030630091-013.png
+% Diagram impuls data acak yang seragam pada [0,1]:
+>plot2d(makeimpulse(1:10,random(1,10)),>bar):
+ %image% TugasAplikom8_Ridwan25030630091-014.png
+% Diagram pencar (scatter) mudah dibuat dengan plot titik biasa. Grafik berikut menunjukkan
+% X dan X+Y berkorelasi positif.
+>x=normal(1,100); plot2d(x,x+rotright(x),>points,style=".."):
+ %image% TugasAplikom8_Ridwan25030630091-015.png
+% 
+% * 6. Regresi dan Korelasi
+% 
+% ** Arti konsep
+% 
+% Regresi linear mencari garis y = a + b x yang paling dekat dengan titik-titik data. Nilai b
+% menunjukkan berapa y berubah ketika x naik 1. Korelasi (antara -1 dan 1) mengukur seberapa
+% erat dua variabel naik atau turun bersama.
+% 
+% ** Contoh dunia nyata
+% 
+% Jam belajar (x) dan nilai ujian (y): makin lama belajar, nilai cenderung naik. Garis regresi
+% memberi perkiraan nilai untuk jam belajar tertentu. Perkiraan itu hanya sebatas pola yang
+% tampak pada data, bukan bukti sebab-akibat.
+% 
+% ** Praktik di EMT
+% 
+% Langkah 1. Garis regresi untuk data satu peubah dicari dengan polyfit(x,y,1), yang memberi
+% [a, b].
+>x=1:10; y=[2,3,1,5,6,3,7,8,9,8]; writetable(x'|y',labc=["x","y"])
+         x         y
+         1         2
+         2         3
+         3         1
+         4         5
+         5         6
+         6         3
+         7         7
+         8         8
+         9         9
+        10         8
+>p=polyfit(x,y,1)
+[0.73333,  0.81212]
+% Garisnya y = 0,733 + 0,812 x.
+% 
+% Langkah 2. Contoh lain: survei mahasiswa berupa usia, usia orang tua, dan banyak saudara
+% dari file table1.dat. Kolom 2 berisi "m" dan "f"; terjemahannya ditentukan lewat tok2
+% (bukan dikumpulkan otomatis oleh readtable).
+>{MS,hd}:=readtable("table1.dat",tok2:=["m","f"]);  ...
+>writetable(MS,labc=hd,tok2:=["m","f"]);
+    Person       Sex       Age    Mother    Father  Siblings
+         1         m        29        58        61         1
+         2         f        26        53        54         2
+         3         m        24        49        55         1
+         4         f        25        56        63         3
+         5         f        25        49        53         0
+         6         f        23        55        55         2
+         7         m        23        48        54         2
+         8         m        27        56        58         1
+         9         m        25        57        59         1
+        10         m        24        50        54         1
+        11         f        26        61        65         1
+        12         m        24        50        52         1
+        13         m        29        54        56         1
+        14         m        28        48        51         2
+        15         f        23        52        52         1
+        16         m        24        45        57         1
+        17         f        24        59        63         0
+        18         f        23        52        55         1
+        19         m        24        54        61         2
+        20         f        23        54        55         1
+% Bagaimana usia-usia itu saling bergantung? Kesan pertama didapat dari diagram pencar
+% berpasangan.
+>scatterplots(tablecol(MS,3:5),hd[3:5]):
+ %image% TugasAplikom8_Ridwan25030630091-016.png
+% Usia ayah dan usia ibu jelas saling bergantung. Garis regresi dicari: s usia ayah dan t usia
+% ibu.
+>cs:=MS[,4:5]'; ps:=polyfit(cs[1],cs[2],1)
+[17.379,  0.74096]
+% Hasilnya s = 17,38 + 0,741 t. Ini jelas model yang kurang tepat, karena selisih usia ayah
+% dan ibu mungkin sedikit bergantung pada usia, tetapi tidak sebesar itu. Model yang lebih
+% wajar adalah s = a + t, dengan a rata-rata selisih usia ayah dan ibu.
+>da:=mean(cs[2]-cs[1])
+3.65
+% Rata-rata ayah 3,65 tahun lebih tua daripada ibu. Semua ditampilkan dalam satu diagram
+% pencar: titik data, garis regresi (merah), dan garis s = t + 3,65 (biru).
+>plot2d(cs[1],cs[2],>points);  ...
+>plot2d("evalpoly(x,ps)",color=red,style=".",>add);  ...
+>plot2d("x+da",color=blue,>add):
+ %image% TugasAplikom8_Ridwan25030630091-017.png
+% Diagram kotak kedua usia hanya menunjukkan bahwa keduanya berbeda.
+>boxplot(cs,["mothers","fathers"]):
+ %image% TugasAplikom8_Ridwan25030630091-018.png
+% Koefisien korelasi menunjukkan korelasi positif.
+>correl(cs[1],cs[2])
+0.75883
+% Korelasi peringkat mengukur keserupaan urutan pada kedua vektor, dan juga cukup positif.
+>rankcorrel(cs[1],cs[2])
+0.75893
+% Hasilnya 0,759 dan 0,759: hubungan positif yang cukup kuat. Catatan kritis: korelasi kuat
+% tidak membuktikan bahwa usia satu orang tua menentukan usia yang lain. Model s = t + a
+% lebih masuk akal dibanding model regresi, walaupun kecocokan angkanya lebih rendah.
+% 
+% * 7. Membuat Fungsi Baru
+% 
+% Bahasa EMT dapat dipakai untuk memprogram fungsi baru. Sebagai contoh, fungsi kemiringan
+% (skewness):
+% latex: \text{sk}(x) = \dfrac{\sqrt{n} \sum_i (x_i-m)^3}{\left(\sum_i (x_i-m)^2\right)^{3/2}}
+% dengan m rata-rata x. Kemiringan 0 berarti sebaran simetris, positif berarti ekor kanan
+% lebih panjang, dan negatif berarti ekor kiri lebih panjang.
+>function skew (x:vector) ...
+$m=mean(x);
+$return sqrt(cols(x))*sum((x-m)^3)/(sum((x-m)^2))^(3/2);
+$endfunction
+% Bahasa matriks membuat implementasinya sangat singkat dan efisien. Dicoba pada data acak
+% normal (hasilnya berubah tiap ENTER, sekitar 0 untuk data banyak):
+>data=normal(20); skew(normal(10))
+-0.13409
+% Fungsi lain adalah koefisien kemiringan Pearson:
+>function skew1 (x) := 3*(mean(x)-median(x))/dev(x)
+>skew1(data)
+1.423
+% 
+% * 8. Simulasi Monte Carlo
+% 
+% ** Arti konsep
+% 
+% Monte Carlo berarti mengulang percobaan acak berkali-kali untuk melihat polanya. Cara ini
+% dipakai ketika menghitung peluang secara langsung terlalu rumit.
+% 
+% ** Contoh dunia nyata
+% 
+% Perusahaan asuransi mensimulasikan ribuan skenario klaim untuk memperkirakan dana cadangan
+% yang diperlukan.
+% 
+% ** Praktik di EMT
+% 
+% Langkah 1. Simulasi 1000 kali pelemparan 3 dadu, lalu frekuensi tiap jumlah mata (3 sampai
+% 18) dihitung.
+>ds:=sum(intrandom(1000,3,6))';  fs=getmultiplicities(3:18,ds)
+[4,  19,  27,  41,  72,  100,  118,  118,  138,  108,  77,  75,  57,
+32,  12,  2]
+>columnsplot(fs,lab=3:18):
+ %image% TugasAplikom8_Ridwan25030630091-019.png
+% Langkah 2. Distribusi yang diharapkan tidak mudah dihitung, sehingga dipakai rekursi.
+% Fungsi berikut menghitung banyak cara bilangan k dapat dinyatakan sebagai jumlah n bilangan
+% pada rentang 1 sampai m.
+>function map countways (k; n, m) ...
+$  if n==1 then return k>=1 && k<=m
+$  else
+$    sum=0;
+$    loop 1 to m; sum=sum+countways(k-#,n-1,m); end;
+$    return sum;
+$  end;
+$endfunction
+% Untuk tiga dadu:
+>cw=countways(3:18,3,6)
+[1,  3,  6,  10,  15,  21,  25,  27,  27,  25,  21,  15,  10,  6,  3,
+1]
+% Hasilnya [1, 3, 6, 10, 15, 21, 25, 27, 27, 25, 21, 15, 10, 6, 3, 1], yang berjumlah 216 =
+% 6^3. Nilai harapan ditambahkan pada gambar (peluang cw/6^3, dikali 1000):
+>plot2d(cw/6^3*1000,>add); plot2d(cw/6^3*1000,>points,>add):
+ %image% TugasAplikom8_Ridwan25030630091-020.png
+% Batang simulasi mengikuti garis teori. Jumlah beberapa dadu berbentuk lonceng dan mendekati
+% distribusi normal, yaitu Teorema Limit Pusat: jumlah banyak peubah acak bebas yang identik
+% mendekati distribusi normal. Contoh nyata: tinggi badan dipengaruhi banyak faktor kecil (gen,
+% gizi, dan lainnya) yang dijumlahkan, sehingga hasil akhirnya berbentuk lonceng.
+% 
+% Langkah 3. Simpangan baku rata-rata n data normal baku adalah 1/akar(n). Untuk n = 10:
+>longformat; 1/sqrt(10)
+0.316227766017
+>shortformat;
+% Dicek dengan simulasi: 10000 kali vektor acak berisi 10 data.
+>M=normal(10000,10); dev(mean(M)')
+0.31914
+>plot2d(mean(M)',>distribution):
+ %image% TugasAplikom8_Ridwan25030630091-021.png
+% Hasil simulasi (sekitar 0,31) mendekati nilai teori 0,316. Artinya, rata-rata banyak data
+% lebih stabil daripada satu data tunggal. Median dari 10 data normal baku punya simpangan
+% yang lebih besar:
+>dev(median(M)')
+0.37273
+% Hasilnya sekitar 0,365, lebih besar daripada 0,316.
+% 
+% * 9. Uji Statistika
+% 
+% ** Arti konsep
+% 
+% Uji statistika menjawab pertanyaan "apakah perbedaan yang terlihat nyata atau hanya
+% kebetulan". Prosesnya: tetapkan hipotesis nol (H0, biasanya "tidak ada perbedaan"), hitung
+% nilai-p, lalu putuskan. Semua uji di EMT mengembalikan galat yang diterima jika H0 ditolak,
+% yaitu nilai-p. Jika nilai-p < 0,05, H0 ditolak. Jika tidak, H0 tidak dapat ditolak.
+% "Tidak dapat ditolak" tidak sama dengan "terbukti benar", hanya berarti buktinya belum
+% cukup.
+% 
+% ** Contoh dunia nyata
+% 
+% Sebuah sekolah mencoba metode belajar baru dan nilai rata-rata kelas naik 3 poin. Apakah
+% kenaikan itu karena metodenya atau hanya kebetulan? Uji statistika membantu menjawabnya
+% dengan angka, bukan dengan perasaan.
+% 
+% ** Praktik di EMT
+% 
+% a. Uji chi-kuadrat untuk dadu. Pada 600 lemparan didapat frekuensi berikut, yang
+% dimasukkan ke uji chi-kuadrat. H0: dadu seimbang (seragam).
+>chitest([90,103,114,101,103,89],dup(100,6)')
+0.49883
+% Nilai-p 0,4988 > 0,05. Uji chi-kuadrat juga punya mode yang memakai simulasi Monte Carlo.
+% Parameter >p menganggap vektor y sebagai vektor peluang.
+>chitest([90,103,114,101,103,89],dup(1/6,6)',>p,>montecarlo)
+0.496
+% Hasilnya mendekati 0,5 (dosen mendapat 0,529, dan nilainya berubah tiap ENTER karena
+% simulasi). Galat sebesar itu terlalu besar untuk menolak H0, jadi keseragaman tidak dapat
+% ditolak. Ini tidak membuktikan dadunya seimbang, hanya bahwa hipotesisnya tidak dapat
+% ditolak.
+% b. Uji-t untuk rata-rata. Berikut data dengan rata-rata sebenarnya 200, lalu diuji apakah
+% rata-ratanya 200. ttest() memerlukan rata-rata, simpangan baku, banyak data, dan nilai
+% rata-rata yang diuji.
+>s=200+normal([1,100])*10; ...
+>ttest(mean(s),dev(s),100,200)
+0.38342
+% Karena H0 benar, nilai-p biasanya di atas 0,05 (dosen mendapat 0,2266). Ulangi ENTER dan
+% nilainya berubah-ubah.
+% 
+% c. Dua pengukuran diuji kesamaan rata-ratanya. H0 ditolak jika hasilnya < 0,05.
+>tcomparedata(normal(1,10),normal(1,10))
+0.43805
+% Jika salah satu distribusi diberi bias (+2), penolakan makin sering. Ulangi beberapa kali
+% untuk melihat efeknya.
+>tcomparedata(normal(1,10),normal(1,10)+2)
+0.005791
+% 
+% d. Uji independensi. Dua kelompok orang (laki-laki dan perempuan) memilih satu dari enam
+% partai.
+>A=[23,37,43,52,64,74;27,39,41,49,63,76];  ...
+>  writetable(A,wc=6,labr=["m","f"],labc=1:6)
+           1     2     3     4     5     6
+     m    23    37    43    52    64    74
+     f    27    39    41    49    63    76
+% Apakah pilihan bebas dari jenis kelamin? Uji tabel chi-kuadrat menjawabnya.
+>tabletest(A)
+0.9907
+% Nilai-p 0,9907 jauh di atas 0,05, jadi kebebasan tidak dapat ditolak. Data ini tidak
+% menunjukkan bahwa pilihan bergantung pada jenis kelamin. Tabel frekuensi harapan:
+>writetable(expectedtable(A),wc=6,dc=1,labr=["m","f"],labc=1:6)
+           1     2     3     4     5     6
+     m  24.9  37.9  41.9  50.3  63.3  74.7
+     f  25.1  38.1  42.1  50.7  63.7  75.3
+% Koefisien kontingensi terkoreksi sangat dekat dengan 0, sehingga pilihan tidak bergantung
+% pada jenis kelamin.
+>contingency(A)
+0.042723
+% 
+% e. Analisis ragam (uji-F, ANOVA). Tiga sampel data normal diuji kesamaan rata-ratanya.
+% Fungsinya varanalysis().
+>x1=[109,111,98,119,91,118,109,99,115,109,94]; mean(x1),
+106.55
+>x2=[120,124,115,139,114,110,113,120,117]; mean(x2),
+119.11
+>x3=[120,112,115,110,105,134,105,130,121,111]; mean(x3)
+116.3
+>varanalysis(x1,x2,x3)
+0.013805
+% Rata-ratanya 106,5; 119,1; dan 116,3. Nilai-p 0,0138 < 0,05, jadi hipotesis kesamaan rata-rata
+% ditolak, dengan peluang salah 1,4 %.
+% 
+% f. Dua perlakuan a dan b diterapkan pada orang yang sama. Uji tanda memutuskan apakah a
+% lebih baik daripada b.
+>a=[8.0,7.4,5.9,9.4,8.6,8.2,7.6,8.1,6.2,8.9];
+>b=[6.8,7.1,6.8,8.3,7.9,7.2,7.4,6.8,6.8,8.1];
+>signtest(a,b)
+0.054687
+% Nilai-p 0,0547 sedikit di atas 0,05, jadi belum dapat ditolak bahwa a sama baiknya dengan b.
+% Uji Wilcoxon lebih tajam, tetapi memakai besar selisihnya:
+>wilcoxon(a,b)
+0.029668
+% Nilai-p 0,0297 < 0,05, jadi H0 ditolak. Catatan kritis: dua uji yang sama-sama sahih
+% memberi kesimpulan berbeda pada batas 0,05. Ini tanda bahwa bukti pada data ini hanya
+% tipis, dan 0,05 bukan "garis ajaib". Dua contoh deret acak berikut menunjukkan perilaku
+% Wilcoxon: dengan selisih -1 ditolak jelas, tanpa selisih tidak ditolak.
+>wilcoxon(normal(1,20),normal(1,20)-1)
+0.054213
+>wilcoxon(normal(1,20),normal(1,20))
+0.11611
+% 
+% * 10. Catatan untuk Pengguna R
+% 
+% EMT bukan pengganti R sebagai paket statistika, tetapi banyak prosedur statistika tersedia di
+% EMT. Catatan ini merangkum perbedaan sintaks yang paling sering menjebak bagi yang sudah
+% mengenal R.
+%% - Vektor: operator ":" di EMT dapat memakai ukuran langkah, misalnya 0:0.5:5. Fungsi c() tidak ada, penggabungan memakai kurung siku: [x,0,x].
+%% - Indeks negatif: di EMT, x[-2] berarti unsur kedua dari belakang, sedangkan di R berarti "semua kecuali unsur ke-2". Perilaku R ditiru dengan drop(x,2).
+%% - Vektor logika: di EMT, hasil perbandingan (0 atau 1) tidak langsung menjadi indeks. Unsur yang bernilai benar diambil dengan nonzeros().
+>x=[10.4, 5.6, 3.1, 6.4, 21.7]; [x,0,x]
+[10.4,  5.6,  3.1,  6.4,  21.7,  0,  10.4,  5.6,  3.1,  6.4,  21.7]
+>x[-2], drop(x,2)
+6.4
+[10.4,  3.1,  6.4,  21.7]
+>x>5, x[nonzeros(x>5)]
+[1,  1,  0,  1,  1]
+[10.4,  5.6,  6.4,  21.7]
+% 
+% * 11. Membaca dan Menulis Data
+% 
+% ** Arti konsep
+% 
+% Data biasanya datang dari luar EMT (Excel, survei, web) dan hasil analisis perlu dibawa
+% keluar. Fungsi writematrix() dan readmatrix() menulis dan membaca matriks. Fungsi
+% writetable() dan readtable() menulis dan membaca tabel berjudul.
+% 
+% ** Contoh dunia nyata
+% 
+% Seorang guru mengekspor nilai dari Excel sebagai CSV, menganalisisnya di EMT, lalu menyimpan
+% ringkasannya kembali sebagai file yang dapat dibuka di Excel.
+% 
+% ** 11.1 Membaca dan menulis vektor
+% 
+% Berikut cara menulis dan membaca vektor bilangan real ke file.
+>a=random(1,100); mean(a), dev(a),
+0.44364
+0.3037
+% Data ditulis ke file dengan writematrix(). Untuk catatan sendiri, file ditulis ke folder
+% yang sama dengan notebook. Vektor kolom a' menghasilkan satu bilangan tiap baris.
+>filename="test.dat";
+>writematrix(a',filename);
+% Data dibaca dengan readmatrix(), lalu file dihapus.
+>a=readmatrix(filename)';
+>fileremove(filename);
+>mean(a), dev(a),
+0.44364
+0.3037
+% Rata-rata dan simpangan baku sebelum dan sesudah penyimpanan sama, jadi data tersimpan dan
+% terbaca dengan benar.
+% 
+% writematrix() dan writetable() dapat diatur untuk bahasa lain. Pada sistem Indonesia (koma
+% sebagai desimal), Excel memerlukan nilai berkoma desimal dengan titik koma sebagai pemisah.
+% Berkas "test.csv" berikut akan muncul di folder kerja saat ini.
+>filename="test.csv"; ...
+>writematrix(random(5,3),file=filename,separator=",");
+% Berkas itu dapat langsung dibuka di Excel versi Indonesia, lalu dihapus:
+>fileremove(filename);
+% 
+% ** 11.2 Berkas CSV
+% 
+% Pertama, sebuah matriks ditulis ke berkas pada folder kerja.
+>file="test.csv";  ...
+>M=random(3,3); writematrix(M,file);
+>printfile(file)
+0.1117588409686002,0.05525081823408583,0.2931835879202024
+0.7714979381194919,0.2541355735629442,0.8463894780460306
+0.2938641984846708,0.4657032427307105,0.5283449738795509
+
+% CSV ini dapat dibuka di Excel versi Inggris dengan klik dua kali. Pada sistem Jerman (atau
+% Indonesia), data perlu diimpor dengan memperhatikan tanda desimal. Tanda titik desimal juga
+% bawaan EMT, sehingga matriks dapat dibaca dengan readmatrix().
+>readmatrix(file)
+  0.11176  0.055251   0.29318 
+   0.7715   0.25414   0.84639 
+  0.29386    0.4657   0.52834 
+% Di Excel atau program serupa, matriks dapat diekspor sebagai CSV. Contoh: excel-data.csv.
+>printfile("excel-data.csv")
+0;1000;1000
+1;1051,271096;1072,508181
+2;1105,170918;1150,273799
+3;1161,834243;1233,67806
+4;1221,402758;1323,129812
+5;1284,025417;1419,067549
+6;1349,858808;1521,961556
+7;1419,067549;1632,31622
+8;1491,824698;1750,6725
+9;1568,312185;1877,610579
+10;1648,721271;2013,752707
+% Sistem Jerman memakai titik koma sebagai pemisah dan koma sebagai desimal. Cara termudah
+% membacanya ke Euler adalah readmatrix() dengan parameter >comma, yang mengganti koma dengan
+% titik. Untuk CSV berbahasa Inggris, parameter itu dihilangkan.
+>M=readmatrix("excel-data.csv",>comma)
+        0      1000      1000 
+        1    1051.3    1072.5 
+        2    1105.2    1150.3 
+        3    1161.8    1233.7 
+        4    1221.4    1323.1 
+        5      1284    1419.1 
+        6    1349.9      1522 
+        7    1419.1    1632.3 
+        8    1491.8    1750.7 
+        9    1568.3    1877.6 
+       10    1648.7    2013.8 
+% Data digambar:
+>plot2d(M'[1],M'[2:3],>points,color=[red,green]'):
+ %image% TugasAplikom8_Ridwan25030630091-022.png
+% Kolom ke-3 (hijau) naik lebih cepat daripada kolom ke-2 (merah). Pola seperti ini sama dengan
+% dua tabungan yang bunganya berbeda: yang bunganya lebih besar tumbuh lebih cepat. Data ini
+% terlihat mengikuti pertumbuhan eksponensial: nilai kolom ke-2 pada t=10 adalah 1648,7 =
+% 1000 e^0,5 dan kolom ke-3 adalah 2013,8 = 1000 e^0,7.
+% 
+% ** 11.3 Membaca dari Web
+% 
+% Situs web atau berkas dengan URL dapat dibuka di EMT dan dibaca baris demi baris. Perlu
+% koneksi internet. Pada contoh ini, versi terbaru dibaca dari situs EMT dengan mencari
+% tulisan "Version ..." pada sebuah judul.
+>function readversion () ...
+$urlopen("http://www.euler-math-toolbox.de/Programs/Changes.html");
+$repeat
+$  until urleof();
+$  s=urlgetline();
+$  k=strfind(s,"Version ",1);
+$  if k>0 then substring(s,k,strfind(s,"<",k)-1), break; endif;
+$end;
+$urlclose();
+$endfunction
+>readversion
+Version 2024-01-12
+% Hasilnya versi EMT pada halaman tersebut (catatan dosen: Version 2021-04-30). Dapat berbeda
+% karena situsnya diperbarui. Data publik lain, termasuk data saham, dapat dibaca dengan cara
+% yang sama, selama dapat diakses.
+% 
+% * 12. Analisis Data Tambahan dari File yang Dibagikan
+% 
+% Paket dosen menyertakan dua file yang tidak dipakai di notebook dosen: sample.csv dan
+% GOOG.csv. Keduanya dipakai di sini sebagai latihan analisis data nyata, dengan alur yang
+% sama: baca, ringkas, gambar, uji.
+% 
+% ** 12.1 Nilai Siswa (sample.csv)
+% 
+% *** Arti konsep dan contoh dunia nyata
+% 
+% File ini berisi 200 baris dengan kolom female (0 = laki-laki, 1 = perempuan), read, write,
+% math (nilai tes), hon (1 jika masuk kelompok berprestasi), dan femalexmath (hasil kali
+% female dan math). Contoh nyata: sekolah ingin tahu apakah ada perbedaan nilai antara siswa
+% laki-laki dan perempuan, dan apakah kemampuan membaca berkaitan dengan kemampuan menulis.
+% 
+% *** Praktik di EMT
+% 
+% Langkah 1. Baca file dengan baris pertama sebagai judul kolom, lalu lihat lima baris pertama.
+>{SM,hs}=readtable("sample.csv",>clabs);
+>writetable(SM[1:5],labc=hs,wc=12)
+      female        read       write        math         hon femalexmath
+           0          57          52          41           0           0
+           1          68          59          53           0          53
+           0          44          33          54           0           0
+           0          63          44          47           0           0
+           0          47          52          57           0           0
+% Langkah 2. Ambil tiap kolom sebagai vektor baris. Nilai asli di file: 109 perempuan dan 91
+% laki-laki.
+>fm=SM[,1]'; rd=SM[,2]'; wr=SM[,3]'; ma=SM[,4]'; hn=SM[,5]';
+>sum(fm), cols(fm)
+109
+200
+% Langkah 3. Ringkasan nilai. Hasil hitung ulang di luar EMT: read rata-rata 52,23 (median 50,
+% simpangan baku 10,25); write 52,78 (54; 9,48); math 52,65 (52; 9,37).
+>mean(rd), median(rd), dev(rd)
+52.23
+50
+10.253
+>mean(wr), median(wr), dev(wr)
+52.775
+54
+9.4786
+>mean(ma), median(ma), dev(ma)
+52.645
+52
+9.3684
+% 
+% Langkah 4. Bandingkan nilai math menurut jenis kelamin. Indeks siswa perempuan dan laki-laki
+% diambil dengan nonzeros().
+>i=nonzeros(fm==1); j=nonzeros(fm==0);
+>mean(ma[i]), mean(ma[j]), dev(ma[i]), dev(ma[j])
+52.394
+52.945
+9.151
+9.6648
+% Perempuan 52,39 (simpangan baku 9,15) dan laki-laki 52,95 (9,66). Selisih rata-rata hanya
+% sekitar 0,55 poin. Uji kesamaan dua rata-rata (H0: sama):
+>tcomparedata(ma[i],ma[j])
+0.34078
+% Nilai-p sekitar 0,68 (hasil hitung ulang di luar EMT, 0,68 baik dengan uji Welch maupun
+% gabungan), jauh di atas 0,05, jadi tidak ada bukti perbedaan nilai math. Untuk nilai write,
+% perempuan rata-rata 54,99 dan laki-laki 50,12:
+>mean(wr[i]), mean(wr[j])
+54.991
+50.121
+>tcomparedata(wr[i],wr[j])
+0.00016982
+% Nilai-p sekitar 0,0003, jadi H0 ditolak: ada perbedaan nilai menulis, dan perempuan lebih
+% tinggi sekitar 4,9 poin. Catatan kritis: ini hanya perbedaan rata-rata kelompok pada data
+% ini, bukan alasan untuk menilai individu, dan sebabnya tidak dapat disimpulkan dari data.
+% 
+% Langkah 5. Hubungan antarnilai. Koefisien korelasi (hitung ulang di luar EMT): read-write
+% 0,597; read-math 0,662; write-math 0,617. Semuanya positif dan cukup kuat.
+>correl(rd,wr), correl(rd,ma), correl(wr,ma)
+0.59678
+0.66228
+0.61745
+% Garis regresi write terhadap read:
+>pf=polyfit(rd,wr,1)
+[23.959,  0.55171]
+% Hasilnya write = 23,96 + 0,552 read. Setiap kenaikan 1 poin read berkaitan dengan kenaikan
+% sekitar 0,55 poin write.
+>plot2d(rd,wr,>points); plot2d("evalpoly(x,pf)",>add,color=red):
+ %image% TugasAplikom8_Ridwan25030630091-023.png
+% 
+% Langkah 6. Apakah kelompok berprestasi (hon) bergantung pada jenis kelamin? Tabel
+% kontingensi dibuat lalu diuji.
+>{x1,x2,ct}=getstatistics(fm,hn); ...
+>writetable(ct,labr=["laki-laki","perempuan"],labc=["tidak","ya"])
+               tidak        ya
+ laki-laki        74        17
+ perempuan        77        32
+>tabletest(ct)
+0.08043
+% Frekuensi: laki-laki 74 tidak dan 17 ya (18,7 %); perempuan 77 tidak dan 32 ya (29,4 %).
+% Nilai-p sekitar 0,080 (uji chi-kuadrat Pearson tanpa koreksi, hitung ulang di luar EMT).
+% Karena 0,080 > 0,05, H0 (saling bebas) tidak dapat ditolak. Selisih 29,4 % dan 18,7 % tampak
+% besar, tetapi pada ukuran sampel ini belum cukup kuat untuk disebut nyata. Catatan kritis:
+% hasil di dekat 0,05 sebaiknya dilaporkan apa adanya, tanpa dibulatkan ke kesimpulan "ada" atau
+% "tidak ada".
+% 
+% ** 12.2 Harga Saham Mingguan (GOOG.csv)
+% 
+% *** Arti konsep dan contoh dunia nyata
+% 
+% File ini berisi harga mingguan Google dari 4 November 2019 sampai 2 November 2020 (kolom
+% Date, Open, High, Low, Close, Adj Close, Volume). Satu baris tanggal 2020-11-02 berisi
+% "null" (data kosong) dan dibuang, sehingga ada 53 data harga penutupan. Contoh nyata: investor
+% melihat seberapa besar harga berayun, dan seberapa cepat harga turun pada masa krisis.
+% Karena kolom tanggal berupa teks dan ada baris "null", harga penutupan (Close) disalin
+% langsung dari file ke dalam vektor berikut, dalam urutan aslinya.
+% 
+% *** Praktik di EMT
+% 
+>Close=[1311.37,1334.87,1295.34,1304.96,1340.62,1347.83,1349.59,1351.89,1360.66, ...
+>1429.73,1480.39,1466.71,1434.23,1479.23,1520.74,1485.11,1339.33,1298.41,1219.73, ...
+>1072.32,1110.71,1097.88,1211.45,1283.25,1279.31,1320.61,1388.37,1373.19,1410.42, ...
+>1428.92,1438.39,1413.18,1431.72,1359.90,1464.70,1541.74,1515.55,1511.87,1482.96, ...
+>1494.49,1507.73,1580.42,1644.41,1591.04,1520.72,1459.99,1444.96,1458.42,1515.22, ...
+>1573.01,1641.00,1621.01,1638.35];
+>n=cols(Close); n
+53
+% Ringkasan harga: rata-rata 1414,68; simpangan baku 132,74; terendah 1072,32 (minggu ke-20,
+% 16 Maret 2020, saat pasar jatuh); tertinggi 1644,41 (minggu ke-43, 24 Agustus 2020).
+>mean(Close), dev(Close), min(Close), max(Close)
+1414.7
+132.74
+1072.3
+1644.4
+>statplot(1:n,Close,"b"):
+ %image% TugasAplikom8_Ridwan25030630091-024.png
+% Grafik memperlihatkan jatuh tajam pada Maret 2020 lalu pulih. Imbal hasil mingguan dihitung
+% dari rasio harga berurutan.
+>ret=Close[2:n]/Close[1:n-1]-1;
+>mean(ret)*100, dev(ret)*100
+0.50989
+4.0352
+% Rata-rata imbal hasil sekitar 0,51 % per minggu dengan simpangan baku sekitar 4,04 %. Dari
+% harga awal 1311,37 sampai akhir 1638,35, kenaikannya sekitar 24,9 %. Imbal hasil terendah
+% sekitar -12,1 % dan tertinggi sekitar 10,3 % dalam satu minggu.
+>min(ret)*100, max(ret)*100
+-12.085
+10.344
+% Garis kecenderungan linear harga terhadap nomor minggu:
+>pg=polyfit(1:n,Close,1)
+[1274.6,  5.1887]
+% Hasilnya Close = 1274,6 + 5,19 minggu. Harga naik rata-rata sekitar 5,2 poin tiap minggu.
+% Catatan kritis: garis lurus ini hanya ringkasan kasar. Penurunan Maret 2020 sangat jauh dari
+% garis, sehingga tidak layak dipakai untuk meramal. Selain itu, simpangan baku imbal hasil 4 %
+% per minggu menunjukkan risiko yang besar. Data hanya satu tahun dan satu saham, sehingga
+% kesimpulannya tidak dapat digeneralisasi.
+% 
+% * 13. Latihan Soal
+% 
+% Kelima soal berikut memakai perintah yang sudah dipakai di atas. Jawaban saya hitung ulang di
+% luar EMT, dan hasilnya sama dengan keluaran yang tertulis di pembahasan.
+% 
+% ** Soal 1: statistika deskriptif
+% 
+% Nilai ujian sepuluh siswa: 70, 75, 80, 85, 90, 60, 65, 95, 78, 82. Tentukan rata-rata,
+% median, dan simpangan baku.
+>nl=[70,75,80,85,90,60,65,95,78,82];
+>mean(nl), median(nl), dev(nl)
+78
+79
+10.893
+% Pembahasan: rata-rata 78, median 79, simpangan baku 10,89. Rata-rata dan median hampir
+% sama, jadi tidak ada nilai ekstrem yang menarik rata-rata. Simpangan baku 10,89 berarti
+% nilai siswa biasanya berbeda sekitar 11 poin dari 78.
+% 
+% ** Soal 2: peluang pada distribusi normal
+% 
+% Tinggi badan siswa berdistribusi normal dengan rata-rata 170 cm dan simpangan baku 6 cm.
+% Tentukan (a) peluang tinggi lebih dari 180 cm dan (b) peluang tinggi antara 160 dan 175 cm.
+>1-normaldis(180,170,6)
+0.04779
+>normaldis(175,170,6)-normaldis(160,170,6)
+0.74988
+% Pembahasan: (a) 0,0478, atau sekitar 4,8 %. 180 cm berada 10/6 = 1,67
+% simpangan baku di atas rata-rata, sehingga jarang. (b) 0,7499, atau
+% sekitar 75 %. Peluang antara dua nilai adalah selisih fungsi
+% distribusi kumulatif di kedua nilai itu.
+% 
+% ** Soal 3: uji chi-kuadrat
+% 
+% Sebuah dadu dilempar 120 kali dan hasilnya untuk sisi 1 sampai 6
+% adalah 18, 22, 20, 25, 15, 20. Ujilah pada taraf 5 % apakah dadu itu
+% seimbang.
+>chitest([18,22,20,25,15,20],dup(20,6)')
+0.7154
+% Pembahasan: H0 adalah dadu seimbang, sehingga frekuensi harapan tiap sisi 120/6 = 20.
+% Statistik chi-kuadrat = (4+4+0+25+25+0)/20 = 2,9 dengan derajat bebas 5, dan nilai-p
+% sekitar 0,715. Karena 0,715 > 0,05, H0 tidak ditolak: tidak ada bukti dadu tidak
+% seimbang.
+% 
+% ** Soal 4: regresi linear
+% 
+% Jam belajar 1 sampai 6 menghasilkan nilai 55, 60, 62, 70, 74, 80. Tentukan garis
+% regresi, perkiraan nilai untuk 7 jam belajar, dan koefisien korelasinya.
+>xj=1:6; yn2=[55,60,62,70,74,80];
+>pj=polyfit(xj,yn2,1)
+[49.333,  5]
+>evalpoly(7,pj), correl(xj,yn2)
+84.333
+0.99172
+>statplot(xj,yn2,"b"); plot2d("evalpoly(x,pj)",>add,color=blue,style="--"):
+ %image% TugasAplikom8_Ridwan25030630091-025.png
+% Pembahasan: garisnya y = 49,33 + 5 x. Setiap tambahan satu jam belajar
+% menaikkan nilai rata-rata sekitar 5 poin. Untuk 7 jam, perkiraannya
+% 84,33. Korelasi 0,992 menunjukkan hubungan positif yang sangat kuat.
+% Perkiraan untuk x = 7 berada di luar data (1 sampai 6), jadi hanya
+% dugaan kasar.
+% 
+% ** Soal 5: simulasi dua dadu
+% 
+% Dua dadu dilempar. Berapa peluang jumlahnya 7? Cek dengan simulasi
+% 10000 lemparan.
+>d2=sum(intrandom(10000,2,6))'; fs2=getmultiplicities(2:12,d2)/10000
+[0.0284,  0.0555,  0.0843,  0.1148,  0.1384,  0.161,  0.142,  0.1097,
+0.0823,  0.0559,  0.0277]
+>fs2[6], 6/36
+0.161
+0.16667
+>columnsplot(fs2,lab=2:12):
+ %image% TugasAplikom8_Ridwan25030630091-026.png
+>             
+% Pembahasan: ada 6 pasangan berjumlah 7 dari 36 kemungkinan, jadi peluang teorinya
+% 6/36 = 0,1667. Hasil simulasi berada di sekitar 0,16 sampai 0,17 dan berubah di setiap
+% ENTER. Elemen ke-6 dari fs2 adalah jumlah 7, karena fs2 dimulai dari jumlah 2. Makin
+% banyak lemparan, hasil simulasi makin dekat ke 0,1667.
+% 
+% * Kesimpulan
+% 
+% 1. Data statistik disimpan sebagai vektor, matriks, dan tabel, serta dibaca dari file.
+% 2. Statistika deskriptif (rata-rata, median, simpangan baku, kuartil) meringkas data.
+% 3. Data acak membantu melihat pola distribusi. Pola itu makin jelas pada data banyak.
+% 4. Uji statistika memakai nilai-p: H0 ditolak jika nilai-p < 0,05. Nilai-p dekat 0,05 perlu
+%    dibaca hati-hati, dan "tidak ditolak" bukan berarti "terbukti benar".
+% 5. Simulasi jumlah dadu menunjukkan Teorema Limit Pusat: hasilnya mendekati normal.
+% 6. Regresi dan korelasi menunjukkan hubungan antardata, tetapi tidak membuktikan sebab-akibat.
+% 7. Pada data nyata (sample.csv dan GOOG.csv), perbedaan rata-rata, korelasi, dan risiko dapat
+%    dihitung dengan perintah yang sama, tetapi kesimpulannya harus mempertimbangkan ukuran
+%    sampel dan asumsi uji.

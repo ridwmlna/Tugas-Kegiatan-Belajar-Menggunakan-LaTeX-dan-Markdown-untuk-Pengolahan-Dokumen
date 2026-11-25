@@ -1,0 +1,702 @@
+﻿% * EMT untuk Perhitungan Aljabar
+% 
+% Nama  : Ridwan Maulana
+%% NIM   : 25030630091
+%% Kelas : Matematika F
+% 
+% Notebook ini berisi catatan belajar menyelesaikan masalah aljabar
+% dengan Euler Math Toolbox (EMT), secara simbolik (hasil eksak) dan
+% numerik (hasil desimal).
+% 
+% Isi notebook:
+%% 1. Operasi bentuk aljabar
+%% 2. Operasi dan fungsi matematika
+%% 3. Bilangan kompleks
+%% 4. Fungsi buatan sendiri
+%% 5. Persamaan dan sistem persamaan
+%% 6. Pertidaksamaan dan sistem pertidaksamaan
+%% 7. Matriks dan vektor
+%% 8. Aljabar untuk masalah sehari-hari
+% 
+% Cara membaca: teks biasa adalah penjelasan, baris berawalan > adalah
+% perintah EMT. Setiap contoh mengikuti urutan: Soal, Ide, Langkah
+% manual, Cek dengan EMT, Penjelasan. Hasil simbolik ditampilkan dengan
+% LaTeX (awalan $&).
+% 
+% * 1. Operasi Bentuk Aljabar
+% 
+% ** Contoh 1: Menyederhanakan bentuk aljabar (hukum eksponen)
+% 
+% Soal:
+% 
+% latex: 6x^{-3}y^5\times\left(-7x^{2}y^{-9}\right)
+% %image% TugasApkom3_Ridwan25030630091-001.png
+% // latex: 6x^{-3}y^5\times\left(-7x^{2}y^{-9}\right)
+% 
+% Ide: kalikan koefisien, lalu jumlahkan pangkat variabel yang sama.
+% 
+% latex: x^a\cdot x^b=x^{a+b}
+% %image% TugasApkom3_Ridwan25030630091-002.png
+% // latex: x^a\cdot x^b=x^{a+b}
+%% - Koefisien: 6 x (-7) = -42
+%% - Variabel x: x^(-3) * x^2 = x^(-1)
+%% - Variabel y: y^5 * y^(-9) = y^(-4)
+% 
+% Hasil manual:
+% 
+% latex: -42x^{-1}y^{-4}=-\dfrac{42}{xy^{4}}
+% %image% TugasApkom3_Ridwan25030630091-003.png
+% // latex: -42x^{-1}y^{-4}=-\dfrac{42}{xy^{4}}
+% 
+% Cek dengan EMT:
+>$&6*x^(-3)*y^5*(-7*x^2*y^(-9))
+ %image% TugasApkom3_Ridwan25030630091-004.png
+% // latex: -\frac{42}{x\,y^4}
+% Penjelasan: hasil EMT sama dengan langkah manual; pangkat negatif
+% otomatis menjadi pecahan.
+% 
+% ** Contoh 2: Menjabarkan bentuk aljabar
+% 
+% Soal:
+% 
+% latex: (6x^{-3}+y^5)(-7x^2-y^{-9})
+% %image% TugasApkom3_Ridwan25030630091-005.png
+% // latex: (6x^{-3}+y^5)(-7x^2-y^{-9})
+% Ide: kalikan setiap suku dengan setiap suku (sifat distributif).
+>$&showev('expand((6*x^(-3)+y^5)*(-7*x^2-y^(-9))))
+ %image% TugasApkom3_Ridwan25030630091-006.png
+% // latex: {\it expand}\left(\left(-\frac{1}{y^9}-7\,x^2\right)\,\left(y^5+  \frac{6}{x^3}\right)\right)=-7\,x^2\,y^5-\frac{1}{y^4}-\frac{6}{x^3  \,y^9}-\frac{42}{x}
+% 
+% * 2. Operasi dan Fungsi Matematika
+% 
+% ** Baris perintah
+% 
+% Satu baris dapat memuat beberapa perintah yang dipisah koma (hasil
+% ditampilkan) atau titik koma (hasil sebelumnya disembunyikan).
+%% Contoh menghitung volume kerucut dengan jari-jari 2 dan tinggi 4.
+% 
+% latex: V=\dfrac{1}{3}\pi r^{2}h
+% %image% TugasApkom3_Ridwan25030630091-007.png
+% // latex: V=\dfrac{1}{3}\pi r^{2}h
+>r:=2; h:=4; pi*r^2*h/3
+16.7551608191
+% 
+% ** Sintaks dasar
+% 
+% EMT memungkinkan beberapa perintah ditulis dalam satu baris.
+%% Perintah dipisahkan dengan koma jika hasilnya ingin ditampilkan,
+%% atau titik koma jika hasil perintah sebelumnya tidak ditampilkan.
+%% Contoh berikut menghitung volume kerucut dengan jari-jari 2
+%% dan tinggi 4.
+% 
+% latex: V=\dfrac{1}{3}\pi r^{2}h
+% %image% TugasApkom3_Ridwan25030630091-008.png
+% // latex: V=\dfrac{1}{3}\pi r^{2}h
+>r:=2; h:=4; pi*r^2*h/3
+16.7551608191
+% 
+% latex: \left(\dfrac{\frac17+\frac18+2}{\frac13+\frac12}\right)^2\pi
+% %image% TugasApkom3_Ridwan25030630091-009.png
+% // latex: \left(\dfrac{\frac17+\frac18+2}{\frac13+\frac12}\right)^2\pi
+> 
+% 
+% ** Bilangan real dan ketelitian numerik
+% 
+% Bilangan real disimpan dalam format IEEE (8 byte) dengan ketelitian
+% sekitar 16 digit desimal, sehingga hasil numerik adalah pendekatan,
+% bukan nilai eksak.
+>longest 1/3
+     0.3333333333333333 
+% 
+% Contoh: 0.1 tidak dapat direpresentasikan secara tepat dalam biner.
+%% akibatnya, penjumlahan sepuluh bilangan 0.1 dapat menyisakan galat
+% pembulatan yang sangat kecil.
+>longest 0.1+0.1+0.1+0.1+0.1+0.1+0.1+0.1+0.1+0.1-1  
+ -1.110223024625157e-16 
+% 
+% ** Matematika simbolik (Maxima)
+% 
+% EMT menggunakan Maxima untuk melakukan perhitungan simbolik.
+%% walan & digunakan untuk mengevaluasi ekspresi secara simbolik,
+%% sedangkan $& menampilkan hasil dalam format LaTeX.
+% 
+% latex: C(44,10)=\dfrac{44!}{34!\cdot 10!}
+% %image% TugasApkom3_Ridwan25030630091-010.png
+% // latex: C(44,10)=\dfrac{44!}{34!\cdot 10!}
+>$& 44!/(34!*10!) // nilai C(44,10)
+ %image% TugasApkom3_Ridwan25030630091-011.png
+% // latex: 2481256778
+% Fungsi binomial(x,3) menghitung kombinasi tiga unsur dari x unsur.
+% 
+% Perintah with digunakan untuk mengganti variabel dengan nilai
+% tertentu.
+>$&binomial(x,3) with x=10
+ %image% TugasApkom3_Ridwan25030630091-012.png
+% // latex: 120
+% * 3. Bilangan Kompleks
+% 
+% Bilangan kompleks merupakan bilangan yang memiliki bagian real dan
+% imajiner. Bentuk umumnya adalah:
+% 
+% latex: z=a+bi
+% %image% TugasApkom3_Ridwan25030630091-013.png
+% // latex: z=a+bi
+% 
+% dengan \(a\) sebagai bagian real, \(b\) sebagai koefisien bagian
+% imajiner, dan \(i\) merupakan satuan imajiner dengan sifat \(i^2=-1\).
+% 
+% ** Bagian real dan imajiner
+% 
+% Misalkan \(z=3+4i\). Bagian realnya adalah 3, sedangkan bagian
+% imajinernya adalah 4.
+>z &= 3+4*I
+
+                               4 I + 3
+
+>$&realpart(z)
+ %image% TugasApkom3_Ridwan25030630091-014.png
+% // latex: 3
+>$&coeff(z,I,1)
+ %image% TugasApkom3_Ridwan25030630091-015.png
+% // latex: 4
+% Perintah realpart() mengambil bagian real, sedangkan coeff()
+%% mengambil koefisien bagian imajiner.
+% 
+% ** Operasi bilangan kompleks
+% 
+% Dua bilangan kompleks dapat dijumlahkan, dikurangkan,
+%% dikalikan, dan dibagi menggunakan aturan operasi aljabar.
+%% Misalkan diberikan z1=3+4i dan z2=1-2i.
+>z1 &= 3+4*I; z2 &= 1-2*I
+
+                               1 - 2 I
+
+>$&z1+z2
+ %image% TugasApkom3_Ridwan25030630091-016.png
+% // latex: 2\,i+4
+>$&z1-z2
+ %image% TugasApkom3_Ridwan25030630091-017.png
+% // latex: 6\,i+2
+>$&z1*z2
+ %image% TugasApkom3_Ridwan25030630091-018.png
+% // latex: \left(1-2\,i\right)\,\left(4\,i+3\right)
+>$&z1/z2
+ %image% TugasApkom3_Ridwan25030630091-019.png
+% // latex: \frac{4\,i+3}{1-2\,i}
+% Hasil menunjukkan bahwa operasi bilangan kompleks mengikuti
+%% aturan aljabar dengan memperhatikan sifat i^2=-1.
+% 
+% ** Konjugat dan modulus
+% 
+% Konjugat diperoleh dengan mengubah tanda bagian imajiner.
+%% Modulus merupakan jarak bilangan kompleks terhadap titik asal.
+% 
+% Rumus konjugat: z_bar = a-bi
+%% Rumus modulus: |z| = sqrt(a^2+b^2)
+>zbar &= 3-4*I
+
+                               3 - 4 I
+
+>$&zbar
+ %image% TugasApkom3_Ridwan25030630091-020.png
+% // latex: 3-4\,i
+>$&sqrt(realpart(z)^2+coeff(z,I,1)^2)
+ %image% TugasApkom3_Ridwan25030630091-021.png
+% // latex: 5
+% Jadi, konjugat dari z=3+4i adalah 3-4i, sedangkan modulusnya adalah 5.
+% 
+% 
+% 
+% * 4. Fungsi Buatan Sendiri
+% 
+% Fungsi dibuat dengan perintah "function". Fungsi numerik memakai ":=",
+% fungsi simbolik memakai "&=", dan fungsi simbolik murni memakai "&&=".
+% 
+% ** Fungsi numerik
+% 
+>function f(x) := x*sqrt(x^2+1)
+>f(2)
+4.472135955
+% 
+% Fungsi otomatis bekerja untuk vektor karena mengikuti aturan bahasa
+% matriks EMT. Nilai x yang membuat f(x)=1 dicari dengan solve (nama
+% fungsi ditulis dalam tanda kutip, tebakan awal 1).
+>f(0:0.1:1)
+[0,  0.100499,  0.203961,  0.313209,  0.430813,  0.559017,  0.699714,
+0.854459,  1.0245,  1.21083,  1.41421]
+>solve("f",1,y=1)
+0.786151377757
+% 
+% Fungsi dapat memiliki parameter default, yaitu nilai yang dipakai jika
+% argumen tidak diberikan.
+>function fd(x,a=1) := a*x^2
+>fd(4)
+16
+>fd(4,5)
+80
+% 
+% ** Fungsi simbolik
+% 
+% Fungsi simbolik berlaku di EMT dan Maxima, sehingga dapat dipakai
+% untuk ungsi buatan sendiri dapat didefinisikan menggunakan perintah
+%% function. Fungsi numerik menggunakan :=, sedangkan fungsi
+%% simbolik menggunakan &= atau &&=.
+>function g(x) &= x^3-x*exp(-x); $&g(x)
+ %image% TugasApkom3_Ridwan25030630091-022.png
+% // latex: x^3-x\,e^ {- x }
+>$&diff(g(x),x)
+ %image% TugasApkom3_Ridwan25030630091-023.png
+% // latex: x\,e^ {- x }-e^ {- x }+3\,x^2
+% Fungsi simbolik juga dapat dijabarkan dan difaktorkan.
+>function P(x,n) &= (2*x-1)^n  
+
+                                       n
+                              (2 x - 1)
+
+% 
+% 
+% ** Fungsi numerik dengan map
+% 
+% Fungsi numerik dapat diterapkan pada vektor sehingga menghasilkan
+%% nilai fungsi untuk setiap elemen. Perintah solve digunakan untuk
+%% mencari nilai x yang memenuhi f(x)=1.
+% 
+% latex: h(x)=\int_1^x t^t\,dt
+% %image% TugasApkom3_Ridwan25030630091-024.png
+% // latex: h(x)=\int_1^x t^t\,dt
+>function map h(x) := integrate("x^x",1,x)
+>h(0:0.5:2)
+[-0.783431,  -0.410816,  0,  0.676863,  2.05045]
+% 
+% ** Fungsi simbolik murni
+% 
+% Fungsi simbolik murni hanya untuk perhitungan simbolik. Contoh: jumlah
+% turunan parsial kedua (Laplacian). Hasil 0 karena bagian real dari
+% (x+iy)^4 adalah fungsi harmonik.
+>function lapl(expr,x,y) &&= diff(expr,x,2)+diff(expr,y,2)
+
+                 diff(expr, y, 2) + diff(expr, x, 2)
+
+>$&lapl((x+I*y)^4,x,y)
+ %image% TugasApkom3_Ridwan25030630091-025.png
+% // latex: 0
+% Ringkasan: "&=" fungsi simbolik, ":=" fungsi numerik, "&&=" fungsi
+% simbolik murni.
+% 
+% * 5. Persamaan dan Sistem Persamaan
+% 
+% solve simbolik menyelesaikan persamaan secara eksak (hasil berupa
+% daftar solusi). solve numerik butuh nilai awal dan nilai target y.
+>$&solve(x^2+x=4,x)
+ %image% TugasApkom3_Ridwan25030630091-026.png
+% // latex: \left[ x=\frac{-\sqrt{17}-1}{2} , x=\frac{\sqrt{17}-1}{2} \right] 
+>sol &= solve([x+y=3,x^2+y^2=5],[x,y]); $&sol, $&x*y with sol[1] 
+ %image% TugasApkom3_Ridwan25030630091-027.png
+% // latex: 2
+ %image% TugasApkom3_Ridwan25030630091-028.png
+% 
+% Solusi sistem: (x,y)=(2,1) dan (1,2); untuk pasangan pertama x*y = 2.
+% 
+% * 6. Pertidaksamaan dan Sistem Pertidaksamaan
+% 
+% EMT menyelesaikan pertidaksamaan lewat Maxima dengan fungsi
+% fourier_elim(), yang harus dimuat dulu dengan load(fourier_elim).
+% Hasil dibaca: "atau" berarti gabungan penyelesaian.
+>&load(fourier_elim)
+
+        C:/Program Files/Euler x64/maxima/share/maxima/5.35.1/share/f\
+ourier_elim/fourier_elim.lisp
+
+>$&fourier_elim([x^2-1>0],[x])
+ %image% TugasApkom3_Ridwan25030630091-029.png
+% // latex: \left[ 1<x \right] \lor \left[ x<-1 \right] 
+>$&fourier_elim([x^2-1<0],[x])
+ %image% TugasApkom3_Ridwan25030630091-030.png
+% // latex: \left[ -1<x , x<1 \right] 
+% Jadi x^2-1>0 berarti x>1 atau x<-1, dan x^2-1<0 berarti -1<x<1.
+% 
+% Sistem tanpa penyelesaian menghasilkan himpunan kosong (emptyset):
+>$&fourier_elim([x<1,x>1],[x])  
+ %image% TugasApkom3_Ridwan25030630091-031.png
+% // latex: {\it fourier\_\_elim}\left(\left[ x<1 , x>1 \right]  , \left[ x   \right] \right)
+% 
+% * 7. Matriks dan Vektor
+% 
+% ** Operasi dasar matriks
+% 
+% Matriks ditulis dengan kurung siku: elemen dipisah koma dan baris
+% dipisah titik koma. Perkalian matriks memakai titik (.), dan tanda '
+% adalah transpos.
+>A=[1,2;3,4]
+            1             2 
+            3             4 
+>b=[3;4]
+            3 
+            4 
+>inv(A) //inverse A
+           -2             1 
+          1.5          -0.5 
+>A.b //perkalian matriks
+           11 
+           25 
+>A.A
+            7            10 
+           15            22 
+>A^2 //perpangkatan elemen2 A
+            1             4 
+            9            16 
+>power(A,3) //perpangkatan matriks 
+           37            54 
+           81           118 
+% 
+% Sistem Ax=b diselesaikan dengan A\b, yaitu hasil kali invers A dan b.
+% 
+% ** Membangun matriks
+% 
+% Matriks disusun dengan "_" (menumpuk ke bawah) dan "|" (menyambung ke
+% samping). Bilangan tunggal yang disambung menjadi kolom berisi
+% bilangan itu.
+>v=1:3; v_v
+            1             2             3 
+            1             2             3 
+>A=[1,2;3,4]; A|[5;6], A|1 
+            1             2             5 
+            3             4             6 
+            1             2             1 
+            3             4             1 
+% 
+% ** Elemen dan submatriks
+% 
+% Elemen dipanggil dengan A[baris,kolom]. Tanda ":" berarti semua indeks
+% (indeks negatif menghitung dari belakang).
+>A=[1,2,3;4,5,6;7,8,9]; A[2,2]
+5
+>A[2], A[:,3], A[,2:3] // baris 2, kolom 3, kolom 2 sampai 3
+[4,  5,  6]
+            3 
+            6 
+            9 
+            2             3 
+            5             6 
+            8             9 
+% 
+% Elemen dan submatriks dapat diubah dengan pemberian nilai (di sini
+% pada salinan B).
+>
+% 
+% ** Vektorisasi
+% 
+% Fungsi bawaan EMT bekerja pada setiap elemen vektor atau matriks,
+% sehingga tabel nilai dapat dibuat tanpa perulangan.
+>sqrt(1:3)
+[1,  1.41421,  1.73205]
+% 
+% Tabel sudut (derajat), radian, cos, dan sin; kolom disambung dengan
+% "|". Nilai yang sangat kecil seperti 1e-16 tampil sebagai 0.
+>defformat; w=(0°:90°:360°)'; deg(w)|w|cos(w)|sin(w)
+% Tiga aturan operasi: fungsi diterapkan ke setiap elemen, operator pada
+% dua matriks seukuran bekerja elemen demi elemen, dan jika ukuran
+% berbeda matriks diperluas otomatis.
+>  
+% 
+% 
+% ** Aljabar linear
+% 
+% Sistem \(Ax=b\) dapat diselesaikan menggunakan perintah A\b. Perintah
+% ini mencari solusi sistem persamaan linear melalui metode eliminasi,
+% tanpa harus menghitung invers matriks secara eksplisit.
+% 
+% latex: Ax=b \Rightarrow x=A^{-1}b
+% %image% TugasApkom3_Ridwan25030630091-032.png
+% // latex: Ax=b \Rightarrow x=A^{-1}b
+>A=[1,2;3,4]; b=[5;6]; A\b
+           -4 
+          4.5 
+% 
+% Pemeriksaan: A.(A\b) harus sama dengan b. Hasil x=-4 dan y=4.5
+%% memenuhi kedua persamaan, yaitu -4+2(4.5)=5 dan 3*(-4)+4*(4.5)=6.
+>A.(A\b)
+            5 
+            6 
+% 
+% Matriks singular (determinan 0) tidak punya invers:
+>A=[1,2,3;4,5,6;7,8,9]; det(A)
+0
+% 
+% ** Matriks simbolik
+% 
+% Matriks yang memuat parameter didefinisikan dengan "&=" dan
+% dioperasikan seperti ekspresi simbolik.
+>A &= [a,1,1;1,a,1;1,1,a]; $A
+ %image% TugasApkom3_Ridwan25030630091-033.png
+% // latex: \begin{pmatrix}a & 1 & 1 \\ 1 & a & 1 \\ 1 & 1 & a \\ \end{pmatrix}
+>$&det(A), $&factor(%)
+ %image% TugasApkom3_Ridwan25030630091-034.png
+% // latex: \left(a-1\right)^2\,\left(a+2\right)
+ %image% TugasApkom3_Ridwan25030630091-035.png
+% Nilai eigen diperoleh dari det(M-xI)=0. (Fungsi eigenvalues()
+% menghitungnya langsung.)
+>M &= [1,a;b,2]; $M
+ %image% TugasApkom3_Ridwan25030630091-036.png
+% // latex: \begin{pmatrix}1 & a \\ b & 2 \\ \end{pmatrix}
+>$&det(M-x*ident(2)), $&solve(%,x)
+ %image% TugasApkom3_Ridwan25030630091-037.png
+% // latex: \left[ x=\frac{3-\sqrt{4\,a\,b+1}}{2} , x=\frac{\sqrt{4\,a\,b+1}+3  }{2} \right] 
+ %image% TugasApkom3_Ridwan25030630091-038.png
+% Substitusi a=4 dan b=5 ke solusi tersebut memberi x=-3 dan x=6.
+>
+% 
+% ** Numerik di dalam simbolik
+% 
+% Matriks yang berlaku di kedua dunia didefinisikan dengan "&:=".
+% Bilangan desimal diubah ke pecahan pendekatan saat masuk ke Maxima;
+% mxmset(A) mencegahnya.
+>A &:= [1,pi;4,5]; $&A
+ %image% TugasApkom3_Ridwan25030630091-039.png
+% // latex: \begin{pmatrix}1 & \frac{1146408}{364913} \\ 4 & 5 \\ \end{pmatrix}
+>mxmset(A); $&A
+ %image% TugasApkom3_Ridwan25030630091-040.png
+% // latex: \begin{pmatrix}1 & 3.141592653589793 \\ 4 & 5 \\ \end{pmatrix}
+% 
+% * 8. Aljabar untuk Masalah Sehari-hari: Bunga Majemuk
+% 
+% Modal awal K=5000 (ribu rupiah) berbunga 3% per tahun. Dengan faktor
+% q=1+3%, saldo setelah n tahun adalah:
+% 
+% latex: K_n=K\,q^{n}
+% %image% TugasApkom3_Ridwan25030630091-041.png
+% // latex: K_n=K\,q^{n}
+>K=5000; q=1+3%; K*q^10
+6719.58189672
+% 
+% ** Setoran atau penarikan tahunan
+% 
+% Jika setiap tahun ditambah (R>0) atau ditarik (R<0) sebesar R:
+% 
+% latex: K_{n+1}=q\,K_n+R
+% %image% TugasApkom3_Ridwan25030630091-042.png
+% // latex: K_{n+1}=q\,K_n+R
+% 
+% Fungsi onepay menghitung saldo setelah satu tahun, sedangkan iterate
+%% mengulang perhitungan tersebut.
+>function onepay (K) := K*q+R
+>R=-200; iterate("onepay",5000,10)
+[5000,  4950,  4898.5,  4845.45,  4790.82,  4734.54,  4676.58,
+4616.88,  4555.38,  4492.04,  4426.81]
+% Untuk mengetahui kapan saldo habis, iterate dapat menggunakan syarat
+%% berhenti dan mengembalikan saldo terakhir serta banyak iterasi.
+>{x,n}=iterate("onepay",5000,till="x<0"); x, n
+-19.8250473465
+47
+% Saldo pertama kali negatif setelah 47 tahun, yaitu sekitar -19.83.
+% 
+% ** Mencari tingkat bunga
+% 
+% Fungsi saldo digunakan untuk mencari tingkat bunga yang menyebabkan
+%% saldo habis setelah jangka waktu tertentu. Perintah solve membutuhkan
+%% tebakan awal untuk mencari solusi numerik.
+>function saldo(K,R,P,n) := iterate("x*(1+P/100)+R",K,n;P,R)[-1]
+>solve("saldo(5000,-200,x,50)",3)
+3.1527238902
+% Saldo pertama kali negatif setelah 47 tahun, yaitu sekitar -19.83.
+% 
+% 
+% ** Rumus eksak (deret geometri)
+% 
+% Pola iterasi satu per satu adalah deret geometri yang dapat
+% dijumlahkan Maxima:
+% 
+% latex: K_n=q^nK+R(1+q+\ldots+q^{n-1})=q^nK+\dfrac{q^n-1}{q-1}R
+% %image% TugasApkom3_Ridwan25030630091-043.png
+% // latex: K_n=q^nK+R(1+q+\ldots+q^{n-1})=q^nK+\dfrac{q^n-1}{q-1}R
+>&sum(q^k,k,0,n-1); $& % = ev(%,simpsum)
+ %image% TugasApkom3_Ridwan25030630091-044.png
+% // latex: \sum_{k=0}^{n-1}{q^{k}}=\frac{q^{n}-1}{q-1}
+% Rumus tersebut dapat ditulis sebagai fungsi saldos. Hasilnya dapat
+%% dibandingkan dengan perhitungan iterasi.
+>function saldos(K,R,P,n) &= (1+P/100)^n*K + ((1+P/100)^n-1)/(P/100)*R; $&saldos(K,R,P,n)
+ %image% TugasApkom3_Ridwan25030630091-045.png
+% // latex: \frac{100\,\left(\left(\frac{P}{100}+1\right)^{n}-1\right)\,R}{P}+K  \,\left(\frac{P}{100}+1\right)^{n}
+>longest saldo(5000,-200,3,47), longest saldos(5000,-200,3,47) 
+     -19.82504734650985 
+     -19.82504734652684 
+% Kedua metode menghasilkan nilai yang hampir sama. Selisih kecil
+% terjadi karena pendekatan numerik dalam perhitungan.
+% 
+% * Latihan Soal dan Pembahasan
+% 
+% Sumber:
+%% J. Stewart, L. Redlin, S. Watson, "Algebra and Trigonometry", 4th ed.,
+% Cengage Learning, 2016.
+%% P. Dawkins, "Calculus Cheat Sheet", Paul's Online Math Notes,
+% tutorial.math.lamar.edu, 2005.
+%% Euler Math Toolbox, "Introduction" (euler_en.pdf), sebagai acuan
+% sintaks perintah EMT.
+% 
+% Soal 1:
+%% an open box is made from a 6 in. by 10 in. sheet by cutting a square
+% of side x from each corner. Volume V = x(6-2x)(10-2x). Expand V and
+% find V(1) and V(2).
+% 
+% Terjemahan: kotak terbuka dibuat dari karton berukuran 6 x 10 inci
+%% dengan memotong persegi bersisi x pada setiap sudut. Jabarkan V,
+%% hitung V(1) dan V(2), serta tentukan x yang menghasilkan volume
+% maksimum.
+%% latex: V=x(6-2x)(10-2x)
+% %image% TugasApkom3_Ridwan25030630091-046.png
+% // latex: V=x(6-2x)(10-2x)
+% 
+% penyelesaian:
+>$&expand(x*(6-2*x)*(10-2*x))
+ %image% TugasApkom3_Ridwan25030630091-047.png
+% // latex: 4\,x^3-32\,x^2+60\,x
+>function Vbox(x) &= x*(6-2*x)*(10-2*x); Vbox(1), Vbox(2)
+32
+24
+>$&solve(diff(Vbox(x),x)=0,x)
+ %image% TugasApkom3_Ridwan25030630091-048.png
+% // latex: \left[ x=\frac{8-\sqrt{19}}{3} , x=\frac{\sqrt{19}+8}{3} \right] 
+>Vbox((8-sqrt(19))/3)
+32.8352829414
+% Penjelasan: V = 4x^3 - 32x^2 + 60x, berderajat 3. V(1) = 32 dan V(2) =
+% 24 in^3. Turunan V = 0 memberi x = (8 - sqrt(19))/3, sekitar 1,214
+% (nilai lain 4,12 di luar batas 0 < x < 3). Volume maksimum sekitar
+% 32,84 in^3.
+% 
+% Soal 2:
+%% factor completely (bentuk seperti ini muncul pada kalkulus, aturan
+% hasil kali): 3x^2(4x-12)^2 + x^3(2)(4x-12)(4).
+% 
+% terjemahan:  faktorkan bentuk aljabar berikut hingga menjadi
+%% bentuk faktor paling sederhana.
+% 
+% latex: 3x^2(4x-12)^2+x^3\cdot 2(4x-12)\cdot 4
+% %image% TugasApkom3_Ridwan25030630091-049.png
+% // latex: 3x^2(4x-12)^2+x^3\cdot 2(4x-12)\cdot 4
+% 
+% penyelesaian:
+>$&factor(3*x^2*(4*x-12)^2+x^3*2*(4*x-12)*4)
+ %image% TugasApkom3_Ridwan25030630091-050.png
+% // latex: 16\,\left(x-3\right)\,x^2\,\left(5\,x-9\right)
+>$&expand(3*x^2*(4*x-12)^2+x^3*2*(4*x-12)*4)
+ %image% TugasApkom3_Ridwan25030630091-051.png
+% // latex: 80\,x^4-384\,x^3+432\,x^2
+>$&expand(16*x^2*(x-3)*(5*x-9))
+ %image% TugasApkom3_Ridwan25030630091-052.png
+% // latex: 80\,x^4-384\,x^3+432\,x^2
+% Penjelasan: hasilnya 16x^2(x-3)(5x-9). Penjabaran bentuk awal dan
+% bentuk faktor sama-sama 80x^4 - 384x^3 + 432x^2.
+% 
+% Soal 3:
+%% calculate the first 12 powers of i, find the pattern, and use it to
+% calculate i^4446.
+% 
+% terjemahan: hitung 12 pangkat pertama dari i, temukan pola
+%% yang terbentuk, kemudian gunakan pola tersebut untuk
+%% menghitung i^4446.
+% 
+% latex: i,\ i^2,\ i^3,\ \ldots,\ i^{12};\quad i^{4446}
+% %image% TugasApkom3_Ridwan25030630091-053.png
+% // latex: i,\ i^2,\ i^3,\ \ldots,\ i^{12};\quad i^{4446}
+%% penyelesaian:
+>$&makelist(I^k,k,1,12)
+ %image% TugasApkom3_Ridwan25030630091-054.png
+% // latex: \left[ i , -1 , -i , 1 , i , -1 , -i , 1 , i , -1 , -i , 1 \right] 
+>mod(4446,4)
+2
+>$&I^4446
+ %image% TugasApkom3_Ridwan25030630091-055.png
+% // latex: -1
+% Penjelasan: polanya berulang dengan periode 4: i, -1, -i, 1. Karena
+% 4446 dibagi 4 bersisa 2, maka i^4446 = i^2 = -1. EMT menghitung i^4446
+% secara simbolik dan memberi hasil -1.
+% 
+% Soal 4 :
+%% a rectangular garden is surrounded by 200 ft of fence and has area
+% 2400 ft^2. Find its length and width.
+% 
+% terjemahan: kebun persegi panjang dikelilingi pagar sepanjang 200 kaki
+% dan luasnya 2400 kaki persegi. Tentukan panjang dan lebarnya.
+% 
+% latex: 2x+2y=200,\quad xy=2400
+% %image% TugasApkom3_Ridwan25030630091-056.png
+% // latex: 2x+2y=200,\quad xy=2400
+% 
+% penyelesaian:
+>$&solve([2*x+2*y=200,x*y=2400],[x,y])
+ %image% TugasApkom3_Ridwan25030630091-057.png
+% // latex: \left[ \left[ x=40 , y=60 \right]  , \left[ x=60 , y=40 \right]    \right] 
+>$&solve(x*(100-x)=2400,x)
+ %image% TugasApkom3_Ridwan25030630091-058.png
+% // latex: \left[ x=60 , x=40 \right] 
+>40*60, 2*(40+60)
+2400
+200
+% Penjelasan: dari keliling x + y = 100, sehingga x(100-x) = 2400.
+% Akarnya x = 40 atau x = 60, dan pasangannya y = 60 atau y = 40. Jadi
+% ukuran kebun 60 kaki kali 40 kaki. Cek: luas 2400 dan keliling 200.
+% 
+% 
+% Soal 5:
+%% "Solve the inequality. Express the solution using interval notation."
+% 
+% Terjemahan: Selesaikan pertidaksamaan berikut dan nyatakan
+% penyelesaian dengan notasi interval. Setiap soal dicek dengan titik
+% uji menggunakan fungsi numerik (hasil 1 berarti benar, 0 salah).
+% 
+% latex: (x+2)(x-1)(x-3)\le 0
+% %image% TugasApkom3_Ridwan25030630091-059.png
+% // latex: (x+2)(x-1)(x-3)\le 0
+% 
+% penyelesaian:
+>$&fourier_elim([(x+2)*(x-1)*(x-3)<=0],[x])
+ %image% TugasApkom3_Ridwan25030630091-060.png
+% // latex: {\it fourier\_\_elim}\left(\left[ \left(x-3\right)\,\left(x-1  \right)\,\left(x+2\right)\leq 0 \right]  , \left[ x \right] \right)
+>$&solve((x+2)*(x-1)*(x-3)=0,x)
+ %image% TugasApkom3_Ridwan25030630091-061.png
+% // latex: \left[ x=-2 , x=1 , x=3 \right] 
+>function q1(x) := (x+2)*(x-1)*(x-3); q1([-3,0,2,4])<=0
+% Penjelasan: kedua ruas dijabarkan dan hasilnya sama, yaitu a^2c^2 +
+% a^2d^2 + b^2c^2 + b^2d^2. Selisih kedua ruas bernilai 0, sehingga
+% identitas terbukti.
+% 
+% Soal 6:
+%% determine the point(s) on y = x^2 + 1 that are closest to (0, 2).
+% 
+% terjemahan: tentukan titik pada kurva y = x^2 + 1 yang paling dekat ke
+% titik (0, 2).
+% 
+% latex: f=x^2+(y-2)^2,\ x^2=y-1\Rightarrow f(y)=y^2-3y+3
+% %image% TugasApkom3_Ridwan25030630091-062.png
+% // latex: f=x^2+(y-2)^2,\ x^2=y-1\Rightarrow f(y)=y^2-3y+3
+>function ff(y) &= (y-1)+(y-2)^2; $&expand(ff(y))
+ %image% TugasApkom3_Ridwan25030630091-063.png
+% // latex: y^2-3\,y+3
+>$&solve(diff(ff(y),y)=0,y), $&solve(x^2+1=3/2,x)
+ %image% TugasApkom3_Ridwan25030630091-064.png
+% // latex: \left[ y=\frac{3}{2} \right] 
+ %image% TugasApkom3_Ridwan25030630091-065.png
+% // latex: \left[ x=-\frac{1}{\sqrt{2}} , x=\frac{1}{\sqrt{2}} \right] 
+>$&ev(ff(y),y=3/2), sqrt(3/4)   
+ %image% TugasApkom3_Ridwan25030630091-066.png
+% // latex: \frac{3}{4}
+0.866025403784
+% Penjelasan: x^2 = y - 1 disubstitusi ke jarak kuadrat sehingga f(y) =
+% y^2 - 3y + 3. Turunan 2y - 3 = 0 memberi y = 3/2, lalu x = plus minus
+% sqrt(2)/2 (sekitar 0,707). Titik terdekat (plus minus 0,707; 1,5).
+% Jarak kuadrat minimum 3/4, jadi jarak minimum sekitar 0,866.
+>
+% 
+% * Kesimpulan
+% 
+% EMT menyelesaikan aljabar secara simbolik (eksak, awalan "&") dan
+% numerik (pendekatan desimal). Hasil numerik hanya pendekatan, jadi
+% selalu perlu dicek.
+%% - Bentuk aljabar: expand, factor, ratsimp, dan with (substitusi).
+%% - Fungsi: ":=" numerik, "&=" simbolik, "&&=" simbolik murni.
+%% - Persamaan: solve simbolik memberi solusi eksak, solve numerik butuh
+% tebakan awal.
+%% - Pertidaksamaan: fourier_elim (via Maxima).
+%% - Matriks: "." perkalian matriks, "*" perkalian elemen, plus inv, det,
+% A\b.
+%% - Aplikasi: bunga majemuk dengan iterate, lalu rumus eksaknya.

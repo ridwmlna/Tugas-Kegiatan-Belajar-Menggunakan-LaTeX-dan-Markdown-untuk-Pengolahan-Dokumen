@@ -1,0 +1,1301 @@
+﻿% * Kalkulus dengan Euler Math Toolbox (EMT)
+% 
+% Nama  : Ridwan Maulana
+%% NIM   : 25030630091
+%% Kelas : Matematika F
+% 
+% Pada tugas pekan 9-10 ini saya mencoba menyelesaikan soal-soal
+% kalkulus memakai Euler Math Toolbox (EMT) dan Maxima, mulai dari
+% fungsi sampai fungsi multivariabel. Tiap topik saya susun dengan pola
+% yang sama: teori singkat, perintah EMT, lalu penjelasan hasilnya.
+% Latihan dari dosen saya jawab langsung di bawah topiknya, dan soal
+% tambahan dari buku Kalkulus saya tulis rumusnya dalam format LaTeX di
+% komentar.
+% 
+% ** Cara Penggunaan Notebook
+% 
+% Tekan ENTER pada setiap baris perintah yang diawali tanda >, lalu
+% amati hasilnya. Kalau perlu, ubah angka atau parameternya untuk
+% melihat bedanya. Baris yang diawali $ adalah lanjutan perintah, dan
+% perintah yang diawali $ atau & dikerjakan oleh Maxima (simbolik).
+% Tanda := dipakai untuk fungsi numerik, sedangkan &= untuk fungsi
+% simbolik.
+% 
+% Ada dua cara menghitung di EMT. Cara numerik hasilnya desimal, cara
+% simbolik (lewat Maxima) hasilnya bentuk eksak seperti pecahan, akar,
+% atau pi. Kalau Maxima tidak sanggup mencari bentuk eksak, kita pindah
+% ke numerik. Materi yang dibahas ada tujuh: fungsi, limit, turunan,
+% integral tak tentu, integral tentu (termasuk luas, volume, panjang
+% kurva, dan kurvatur), barisan dan deret, serta fungsi multivariabel.
+% 
+% ** Numerik dan Simbolik pada EMT
+% 
+% EMT memiliki dua cara utama untuk mendefinisikan fungsi:
+%% - := untuk fungsi numerik, cocok untuk menghitung nilai dan membuat
+% grafik.
+%% - &= untuk fungsi simbolik, terhubung dengan Maxima dan dapat
+% digunakan untuk manipulasi aljabar, limit, turunan, dan integral.
+>sqrt(2)
+1.41421356237
+>&sqrt(2)
+
+                               sqrt(2)
+
+>$float(sqrt(2))
+ %image% TugasAplikom6_Ridwan25030630091-001.png
+% // latex: 1.414213562373095
+% Baris pertama desimal, baris kedua tetap eksak, baris ketiga mengubah
+% bentuk eksak itu jadi desimal lagi.
+% 
+% * 1. Fungsi
+% 
+% Fungsi f memasangkan setiap x di domain dengan tepat satu nilai f(x).
+% Yang perlu diingat adalah domainnya: akar hanya untuk bilangan tidak
+% negatif, logaritma hanya untuk bilangan positif, dan penyebut tidak
+% boleh nol.
+% 
+% ** Contoh:
+% 
+% latex: f(x)=2x^2+e^{\sin(x)}, \quad g(x)=\frac{\sqrt{x^2-3x}}{x+1}.
+% %image% TugasAplikom6_Ridwan25030630091-002.png
+% // latex: f(x)=2x^2+e^{\sin(x)}, \quad g(x)=\frac{\sqrt{x^2-3x}}{x+1}.
+>function f(x) := 2*x^2+exp(sin(x))
+>function g(x) := sqrt(x^2-3*x)/(x+1)
+>f(0), f(1), f(pi)
+1
+4.31977682472
+20.7392088022
+>g(3), g(5)
+0
+0.527046276695
+>f(g(5)), g(f(5))
+2.20920171961
+0.950898070639
+>f(0:10)
+[1,  4.31978,  10.4826,  19.1516,  32.4692,  50.3833,  72.7562,
+99.929,  130.69,  163.51,  200.58]
+% f(0:10) menghitung f untuk x = 0,1,...,10 sekaligus. Nilai f(g(5))
+% dan g(f(5)) berbeda (2,209 dan 0,951), jadi komposisi fungsi tidak
+% komutatif.
+>g(1)
+Floating point error!
+Error in sqrt
+Try "trace errors" to inspect local variables after errors.
+g:
+    useglobal; return sqrt(x^2-3*x)/(x+1) 
+Error in:
+g(1) ...
+    ^
+% g(1) error karena x^2-3x = -2, akar bilangan negatif. Fungsi numerik
+% EMT hanya bekerja di bilangan riil, jadi x=1 bukan bagian domain g.
+% 
+% Fungsi sepotong-sepotong harus ditulis sebagai program, bukan satu
+% baris. Kata map dipakai supaya fungsinya bisa menerima vektor.
+% latex: p(x)=\begin{cases} x^3 & x>0 \\ x^2 & x\le 0 \end{cases}
+>function map piece(x) ...
+$ if x<0 then return x^2
+$ else return x^3
+$ endif;
+$endfunction
+>piece(-2), piece(2), piece(-3:3)
+4
+8
+[9,  4,  1,  0,  1,  8,  27]
+>aspect(1.5); plot2d("piece(x)",-3,3):
+ %image% TugasAplikom6_Ridwan25030630091-003.png
+% Grafiknya menyambung mulus di x=0 karena kedua potongan sama-sama
+% bernilai 0 di situ (fungsinya kontinu).
+% 
+% Versi simbolik: komposisinya langsung muncul sebagai rumus.
+>function fe(x) &= 2*E^x
+
+                                    x
+                                 2 E
+
+>function ge(x) &= 3*x+1
+
+                               3 x + 1
+
+>function he(x) &= fe(ge(x))
+
+                                 3 x + 1
+                              2 E
+
+>$he(x)
+ %image% TugasAplikom6_Ridwan25030630091-004.png
+% // latex: 2\,e^{3\,x+1}
+% Hasilnya 2e^(3x+1), tidak perlu menyusun ulang secara manual.
+% 
+% ** Latihan 1: lima fungsi
+% 
+% Soal: definisikan fungsi aljabar, trigonometri, eksponensial,
+% logaritma, dan komposisi; hitung nilainya (satu nilai dan vektor);
+% gambar grafiknya.
+% 
+% latex: p(x)=x^3-3x+1,\; q(x)=\sin 2x+\cos x,\; r(x)=3e^{-x},\; s(x)=\ln(x+1)
+% %image% TugasAplikom6_Ridwan25030630091-005.png
+% // latex: p(x)=x^3-3x+1,\; q(x)=\sin 2x+\cos x,\; r(x)=3e^{-x},\; s(x)=\ln(x+1)
+>function p(x) := x^3-3*x+1
+>function q(x) := sin(2*x)+cos(x)
+>function r(x) := 3*exp(-x)
+>function s(x) := log(x+1)
+>p(0), p(2), p(0:3)
+1
+3
+[1,  -1,  3,  19]
+>q(0), q(pi/2), q([0,pi/2,pi])
+1
+0
+[1,  0,  -1]
+>r(0), r(1), r(0:3)
+3
+1.10363832351
+[3,  1.10364,  0.406006,  0.149361]
+>s(0), s(exp(1)-1), s(0:4)
+0
+1
+[0,  0.693147,  1.09861,  1.38629,  1.60944]
+>aspect(1.5); plot2d(["p(x)","q(x)","r(x)"],-2,3,color=[blue,red,green]):
+ %image% TugasAplikom6_Ridwan25030630091-006.png
+>plot2d("s(x)",-0.9,5):
+ %image% TugasAplikom6_Ridwan25030630091-007.png
+% Penjelasan: setiap fungsi saya beri nama berbeda supaya tidak saling
+% menimpa. p(0:3) = [1,-1,3,19]. s(e-1) = 1 karena ln(e) = 1. Grafik s
+% saya mulai dari x=-0,9 karena ln(x+1) tidak terdefinisi untuk x<=-1
+% (di x=-1 ada asimtot tegak).
+% 
+% Komposisi dua fungsi dengan urutan dibalik:
+%% latex: a(x)=x^2+1,\quad b(x)=\sqrt{x}.
+% %image% TugasAplikom6_Ridwan25030630091-008.png
+% // latex: a(x)=x^2+1,\quad b(x)=\sqrt{x}.
+>function fa(x) &= x^2+1
+
+                                 2
+                                x  + 1
+
+>function fb(x) &= sqrt(x)
+
+                               sqrt(x)
+
+>function fab(x) &= fa(fb(x))
+
+                                x + 1
+
+>function fba(x) &= fb(fa(x))
+
+                                   2
+                             sqrt(x  + 1)
+
+>$fab(x), $fba(x)
+ %image% TugasAplikom6_Ridwan25030630091-009.png
+% // latex: x+1
+ %image% TugasAplikom6_Ridwan25030630091-010.png
+% // latex: \sqrt{x^2+1}
+>fab(4), fba(4)
+5
+4.12310562562
+>plot2d(["x+1","sqrt(x^2+1)"],0,4,color=[blue,red]):
+ %image% TugasAplikom6_Ridwan25030630091-011.png
+% Penjelasan: a(b(x)) = x+1, sedangkan b(a(x)) = akar(x^2+1). Di x=4
+% hasilnya 5 dan 4,123. Jadi urutan komposisi mempengaruhi hasil.
+% 
+% * 2. Limit Fungsi
+% 
+% Limit f(x) saat x mendekati a bernilai L kalau f(x) bisa dibuat
+% sedekat mungkin ke L dengan memilih x cukup dekat ke a (x tidak harus
+% sama dengan a). Limit ada kalau limit kiri sama dengan limit kanan:
+% 
+% latex: \lim_{x\to a}f(x)=L \iff \lim_{x\to a^-}f(x)=\lim_{x\to a^+}f(x)=L.
+% %image% TugasAplikom6_Ridwan25030630091-012.png
+% // latex: \lim_{x\to a}f(x)=L \iff \lim_{x\to a^-}f(x)=\lim_{x\to a^+}f(x)=L.
+% 
+% Di EMT limit dihitung Maxima. Limit kiri memakai minus, limit kanan
+% plus, tak hingga ditulis inf dan minf. Hasil "ind" artinya tak tentu
+% (limit tidak ada).
+% 
+% ** Contoh:
+% 
+% Fungsi yang berlubang tetapi limitnya ada:
+% 
+% latex: \lim_{x\to 3}\frac{x^3-13x^2+51x-63}{x^3-4x^2-3x+18}
+% %image% TugasAplikom6_Ridwan25030630091-013.png
+% // latex: \lim_{x\to 3}\frac{x^3-13x^2+51x-63}{x^3-4x^2-3x+18}
+>$showev('limit((x^3-13*x^2+51*x-63)/(x^3-4*x^2-3*x+18),x,3))
+ %image% TugasAplikom6_Ridwan25030630091-014.png
+% // latex: \lim_{x\rightarrow 3}{\frac{x^3-13\,x^2+51\,x-63}{x^3-4\,x^2-3\,x+  18}}=-\frac{4}{5}
+>aspect(1.5); plot2d("(x^3-13*x^2+51*x-63)/(x^3-4*x^2-3*x+18)",0,4); plot2d(3,-4/5,>points,style="ow",>add):
+ %image% TugasAplikom6_Ridwan25030630091-015.png
+% Fungsinya tidak terdefinisi di x=3 (lingkaran kosong di grafik), tapi
+% kurvanya mendekati -4/5 dari kedua sisi, jadi limitnya -4/5.
+% 
+% Tiga limit berbentuk 0/0 yang hasilnya ada:
+>$showev('limit(2*x*sin(x)/(1-cos(x)),x,0))
+ %image% TugasAplikom6_Ridwan25030630091-016.png
+% // latex: 2\,\left(\lim_{x\rightarrow 0}{\frac{x\,\sin x}{1-\cos x}}\right)=4
+>$showev('limit(cot(7*h)/cot(5*h),h,0))
+ %image% TugasAplikom6_Ridwan25030630091-017.png
+% // latex: \lim_{h\rightarrow 0}{\frac{\cot \left(7\,h\right)}{\cot \left(5\,h  \right)}}=\frac{5}{7}
+>$showev('limit(sin(x)/x,x,0))
+ %image% TugasAplikom6_Ridwan25030630091-018.png
+% // latex: \lim_{x\rightarrow 0}{\frac{\sin x}{x}}=1
+% Hasilnya 4, 5/7, dan 1. Bentuk 0/0 tidak otomatis berarti limitnya
+% tidak ada, tergantung fungsinya.
+% 
+% Limit di tak hingga dan bilangan e:
+>$showev('limit(sqrt(x^2+x)-x,x,inf))
+ %image% TugasAplikom6_Ridwan25030630091-019.png
+% // latex: \lim_{x\rightarrow \infty }{\sqrt{x^2+x}-x}=\frac{1}{2}
+>$showev('limit((1+1/x)^x,x,inf))
+ %image% TugasAplikom6_Ridwan25030630091-020.png
+% // latex: \lim_{x\rightarrow \infty }{\left(\frac{1}{x}+1\right)^{x}}=e
+>plot2d("(1+1/x)^x",0,1000):
+ %image% TugasAplikom6_Ridwan25030630091-021.png
+% Hasil pertama 1/2 dan kedua e. Walaupun 1/x menuju 0 (basisnya
+% menuju 1), hasilnya bukan 1 karena pangkatnya ikut membesar. Grafik
+% mendatar di sekitar 2,718.
+% 
+% Limit yang tidak ada karena berosilasi:
+>$showev('limit(sin(1/x),x,0))
+ %image% TugasAplikom6_Ridwan25030630091-022.png
+% // latex: \lim_{x\rightarrow 0}{\sin \left(\frac{1}{x}\right)}={\it ind}
+>$showev('limit(sin(1/x),x,inf))
+ %image% TugasAplikom6_Ridwan25030630091-023.png
+% // latex: \lim_{x\rightarrow \infty }{\sin \left(\frac{1}{x}\right)}=0
+>plot2d("sin(1/x)",-5,5):
+ %image% TugasAplikom6_Ridwan25030630091-024.png
+% Di x=0 hasilnya ind: grafiknya bergoyang makin rapat antara -1 dan 1
+% sehingga tidak mendekati satu nilai. Untuk x menuju tak hingga, 1/x
+% menuju 0 jadi sin(1/x) menuju 0.
+% 
+% ** Latihan 2: lima limit
+% 
+% Soal 1:
+%% latex: \lim_{x\to 3}\frac{x^2-9}{2x^2-5x-3}
+% %image% TugasAplikom6_Ridwan25030630091-025.png
+% // latex: \lim_{x\to 3}\frac{x^2-9}{2x^2-5x-3}
+>$showev('limit((x^2-9)/(2*x^2-5*x-3),x,3))
+ %image% TugasAplikom6_Ridwan25030630091-026.png
+% // latex: \lim_{x\rightarrow 3}{\frac{x^2-9}{2\,x^2-5\,x-3}}=\frac{6}{7}
+>plot2d("(x^2-9)/(2*x^2-5*x-3)",2,4); plot2d(3,6/7,>points,style="ow",>add):
+ %image% TugasAplikom6_Ridwan25030630091-027.png
+% Penjelasan: difaktorkan jadi (x-3)(x+3) / ((x-3)(2x+1)). Faktor (x-3)
+% dicoret, sisa (x+3)/(2x+1) yang bernilai 6/7 di x=3. Grafiknya
+% berlubang di (3, 6/7).
+% 
+% Soal 2:
+%% latex: \lim_{x\to 1^-}\frac{|x-1|}{x-1}\quad\text{dan}\quad \lim_{x\to 1^+}\frac{|x-1|}{x-1}
+% %image% TugasAplikom6_Ridwan25030630091-028.png
+% // latex: \lim_{x\to 1^-}\frac{|x-1|}{x-1}\quad\text{dan}\quad \lim_{x\to 1^+}\frac{|x-1|}{x-1}
+>$showev('limit(abs(x-1)/(x-1),x,1,minus))
+ %image% TugasAplikom6_Ridwan25030630091-029.png
+% // latex: \lim_{x\uparrow 1}{\frac{\left| x-1\right| }{x-1}}=-1
+>$showev('limit(abs(x-1)/(x-1),x,1,plus))
+ %image% TugasAplikom6_Ridwan25030630091-030.png
+% // latex: \lim_{x\downarrow 1}{\frac{\left| x-1\right| }{x-1}}=1
+% Penjelasan: di kiri 1, |x-1| = -(x-1) sehingga hasilnya -1. Di kanan 1
+% hasilnya +1. Karena beda, limit dua sisi di x=1 tidak ada.
+% 
+% Soal 3:
+%% latex: \lim_{x\to 0}\frac{1-\cos x}{x^2}
+% %image% TugasAplikom6_Ridwan25030630091-031.png
+% // latex: \lim_{x\to 0}\frac{1-\cos x}{x^2}
+>$showev('limit((1-cos(x))/x^2,x,0))
+ %image% TugasAplikom6_Ridwan25030630091-032.png
+% // latex: \lim_{x\rightarrow 0}{\frac{1-\cos x}{x^2}}=\frac{1}{2}
+% Penjelasan: hasilnya 1/2. Lewat kali sekawan, 1-cos x = sin^2 x /
+% (1+cos x), jadi bentuknya (sin x / x)^2 / (1+cos x) yang menuju 1/2.
+% 
+% Soal 4:
+%% latex: \lim_{x\to\infty}\left(\sqrt{x^2+x}-x\right)
+% %image% TugasAplikom6_Ridwan25030630091-033.png
+% // latex: \lim_{x\to\infty}\left(\sqrt{x^2+x}-x\right)
+>$showev('limit(sqrt(x^2+x)-x,x,inf))
+ %image% TugasAplikom6_Ridwan25030630091-034.png
+% // latex: \lim_{x\rightarrow \infty }{\sqrt{x^2+x}-x}=\frac{1}{2}
+% Penjelasan: dikali sekawan jadi x/(sqrt(x^2+x)+x). Dibagi x, dan saat
+% x besar hasilnya 1/(1+1) = 1/2.
+% 
+% Soal 5: gambar salah satu fungsi dan hubungkan dengan limitnya.
+>plot2d("sqrt(x^2+x)-x",1,100); plot2d("0.5+0*x",1,100,>add,color=red):
+ %image% TugasAplikom6_Ridwan25030630091-035.png
+% Penjelasan: kurva biru naik lalu hampir menempel pada garis merah y =
+% 0,5. Itu arti limit tak hingga: nilai fungsi makin dekat ke 0,5 tapi
+% tidak harus menyentuhnya. Catatan: grafik hanya membantu melihat,
+% bukan pembuktian.
+% 
+% * 3. Turunan Fungsi
+% 
+% Turunan didefinisikan lewat limit:
+% 
+% latex: f'(x)=\lim_{h\to 0}\frac{f(x+h)-f(x)}{h}.
+% %image% TugasAplikom6_Ridwan25030630091-036.png
+% // latex: f'(x)=\lim_{h\to 0}\frac{f(x+h)-f(x)}{h}.
+% 
+% Artinya kemiringan garis singgung di titik x, atau laju perubahan
+% sesaat. Aturan yang dipakai: jumlah, hasil kali (fg)'=f'g+fg', hasil
+% bagi, dan rantai (f(g))'=f'(g)g'.
+% 
+% ** Turunan dari definisi
+%% ** contoh:
+% 
+>$showev('limit(((x+h)^n-x^n)/h,h,0))
+ %image% TugasAplikom6_Ridwan25030630091-037.png
+% // latex: \lim_{h\rightarrow 0}{\frac{\left(x+h\right)^{n}-x^{n}}{h}}=n\,x^{n  -1}
+% Hasilnya n x^(n-1). Alasannya: (x+h)^n diuraikan dengan binomial,
+% dikurangi x^n lalu dibagi h, sisa n x^(n-1) ditambah suku-suku yang
+% masih memuat h, dan suku itu hilang saat h menuju 0.
+>$showev('limit((sin(x+h)-sin(x))/h,h,0))
+ %image% TugasAplikom6_Ridwan25030630091-038.png
+% // latex: \lim_{h\rightarrow 0}{\frac{\sin \left(x+h\right)-\sin x}{h}}=\cos   x
+% Hasilnya cos x. sin(x+h) = sin x cos h + cos x sin h, jadi hasil
+% baginya sin x (cos h - 1)/h + cos x (sin h)/h. Saat h menuju 0 suku
+% pertama menuju 0 dan suku kedua menuju cos x.
+>$showev('limit((log(x+h)-log(x))/h,h,0))
+ %image% TugasAplikom6_Ridwan25030630091-039.png
+% // latex: \lim_{h\rightarrow 0}{\frac{\log \left(x+h\right)-\log x}{h}}=  \frac{1}{x}
+% Hasilnya 1/x. (ln(x+h)-ln x)/h = (1/x) ln((1+h/x)^(x/h)), dan bentuk
+% di dalam ln menuju e, jadi hasilnya (1/x) ln e = 1/x.
+% 
+% Untuk x^x, Maxima perlu tahu bahwa x positif:
+>function fx(x) &= x^x
+
+                                   x
+                                  x
+
+>&assume(x>0); $showev('limit((fx(x+h)-fx(x))/h,h,0))
+ %image% TugasAplikom6_Ridwan25030630091-040.png
+% // latex: \lim_{h\rightarrow 0}{\frac{\left(x+h\right)^{x+h}-x^{x}}{h}}=x^{x}  \,\left(\log x+1\right)
+>&forget(x>0)
+
+                               [x > 0]
+
+% Hasilnya x^x (ln x + 1). Cara manualnya: y = x^x, ln y = x ln x,
+% turunkan: y'/y = ln x + 1, jadi y' = x^x (ln x + 1).
+>$showev('limit((asin(x+h)-asin(x))/h,h,0))
+ %image% TugasAplikom6_Ridwan25030630091-041.png
+% // latex: \lim_{h\rightarrow 0}{\frac{\arcsin \left(x+h\right)-\arcsin x}{h}}=  \frac{1}{\sqrt{1-x^2}}
+% Hasilnya 1/akar(1-x^2). Manualnya: y = arcsin x berarti sin y = x.
+% Turunkan: cos y . y' = 1, dan cos y = akar(1-x^2) karena cos y positif
+% di (-pi/2, pi/2).
+% 
+% ** diff dan diffc
+% 
+>function fz(x) &= sin(3*x^5+7)^2
+
+                               2    5
+                            sin (3 x  + 7)
+
+>diff("fz(x)",3), diffc("fz(x)",3)
+1198.32948904
+1198.72863721
+>$showev('diff(fz(x),x))
+ %image% TugasAplikom6_Ridwan25030630091-042.png
+% // latex: \frac{d}{d\,x}\,\sin ^2\left(3\,x^5+7\right)=30\,x^4\,\cos \left(3  \,x^5+7\right)\,\sin \left(3\,x^5+7\right)
+% Dari rumus turunannya, 30 x^4 cos(3x^5+7) sin(3x^5+7), nilai eksak di
+% x=3 adalah 1198,7286. diffc memberi 1198,7286 (pas), sedangkan diff
+% memberi 1198,329 (meleset sedikit). Dugaan saya, diff memakai selisih
+% biasa sehingga kurang teliti kalau fungsinya berubah sangat cepat
+% seperti ini. Itu dugaan, belum saya cek ke dokumentasi EMT.
+% 
+% Titik tempat turunan bernilai nol:
+>function f1(x) &= 5*cos(2*x)-2*x*sin(2*x)
+
+                      5 cos(2 x) - 2 x sin(2 x)
+
+>function df1(x) &= diff(f1(x),x)
+
+                     - 12 sin(2 x) - 4 x cos(2 x)
+
+>xp=solve("df1(x)",1,2,0)
+1.35822987384
+>df1(xp), f1(xp)
+0
+-5.67530133759
+>plot2d(["f1(x)","df1(x)"],0,2*pi,color=[blue,red]):
+ %image% TugasAplikom6_Ridwan25030630091-043.png
+% xp = 1,358 adalah titik tempat f1'(xp) = 0, dan nilai f1 di situ
+% sekitar -5,675 (lembah kurva biru). Di setiap puncak atau lembah kurva
+% biru, kurva merah (turunannya) memotong sumbu x.
+% 
+% ** Latihan 3
+% 
+% Soal 1 (dari definisi):
+%% latex: f(x)=x^3-3x+2
+% %image% TugasAplikom6_Ridwan25030630091-044.png
+% // latex: f(x)=x^3-3x+2
+>$showev('limit(((x+h)^3-3*(x+h)+2-(x^3-3*x+2))/h,h,0))
+ %image% TugasAplikom6_Ridwan25030630091-045.png
+% // latex: \lim_{h\rightarrow 0}{\frac{\left(x+h\right)^3-x^3-3\,\left(x+h  \right)+3\,x}{h}}=3\,x^2-3
+% Penjelasan: (x+h)^3 - x^3 = 3x^2 h + 3x h^2 + h^3 dan -3(x+h)+3x =
+% -3h. Dibagi h jadi 3x^2 + 3xh + h^2 - 3, lalu h menuju 0, hasilnya
+% 3x^2 - 3.
+% 
+% Soal 2 (hasil kali):
+% 
+% latex: h(x)=x\,e^{x}
+% %image% TugasAplikom6_Ridwan25030630091-046.png
+% // latex: h(x)=x\,e^{x}
+>function hh(x) &= x*exp(x)
+
+                                    x
+                                 x E
+
+>$diff(hh(x),x)
+ %image% TugasAplikom6_Ridwan25030630091-047.png
+% // latex: x\,e^{x}+e^{x}
+% Penjelasan: (x)' e^x + x (e^x)' = e^x + x e^x = (x+1) e^x.
+% 
+% Soal 3 (aturan rantai):
+% 
+% latex: g(x)=\sin(x^2)
+% %image% TugasAplikom6_Ridwan25030630091-048.png
+% // latex: g(x)=\sin(x^2)
+>function ss(x) &= sin(x^2)
+
+                                    2
+                               sin(x )
+
+>$diff(ss(x),x)
+ %image% TugasAplikom6_Ridwan25030630091-049.png
+% // latex: 2\,x\,\cos x^2
+% Penjelasan: turunan sin(u) adalah cos(u) u', dengan u = x^2 dan u' =
+% 2x, hasilnya 2x cos(x^2).
+% 
+% Soal 4 (implisit):
+% 
+% latex: x^2+y^2=25,\; \text{cari } \frac{dy}{dx}\text{ di }(3,4).
+% %image% TugasAplikom6_Ridwan25030630091-050.png
+% // latex: x^2+y^2=25,\; \text{cari } \frac{dy}{dx}\text{ di }(3,4).
+>Fk &= x^2+y^2-25
+
+                              2    2
+                             y  + x  - 25
+
+>dydx &= -diff(Fk,x)/diff(Fk,y)
+
+                                   x
+                                 - -
+                                   y
+
+>&subst([x=3,y=4],dydx)
+
+                                   3
+                                 - -
+                                   4
+
+>plot2d(Fk,r=6,level=0):
+ %image% TugasAplikom6_Ridwan25030630091-051.png
+% Penjelasan: dy/dx = -Fx/Fy = -x/y. Di (3,4) nilainya -3/4. Gambarnya
+% lingkaran jari-jari 5, dan garis singgung di (3,4) memang miring
+% turun.
+% 
+% Soal 5 (titik stasioner):
+% 
+% latex: m(x)=x^3-3x
+% %image% TugasAplikom6_Ridwan25030630091-052.png
+% // latex: m(x)=x^3-3x
+>function m(x) &= x^3-3*x
+
+                                3
+                               x  - 3 x
+
+>function dm(x) &= diff(m(x),x)
+
+                                  2
+                               3 x  - 3
+
+>&solve(dm(x)=0,x)
+
+                           [x = - 1, x = 1]
+
+>$diff(m(x),x,2)
+ %image% TugasAplikom6_Ridwan25030630091-053.png
+% // latex: 6\,x
+>m(-1), m(1)
+2
+-2
+>plot2d(["m(x)","dm(x)"],-2.5,2.5,color=[blue,red]):
+ %image% TugasAplikom6_Ridwan25030630091-054.png
+% Penjelasan: m'(x) = 3x^2-3 = 0 memberi x = -1 dan x = 1. Turunan kedua
+% m''(x) = 6x bernilai -6 di x=-1 (cekung ke bawah, maksimum, nilai 2)
+% dan 6 di x=1 (cekung ke atas, minimum, nilai -2).
+% 
+% * 4. Integral Tak Tentu
+% 
+% Integral tak tentu adalah mencari antiturunan F dari f:
+% 
+% latex: \int f(x)\,dx=F(x)+C,\quad F'(x)=f(x).
+% %image% TugasAplikom6_Ridwan25030630091-055.png
+% // latex: \int f(x)\,dx=F(x)+C,\quad F'(x)=f(x).
+% 
+% Konstanta C perlu karena turunan konstanta adalah nol (Maxima tidak
+% menuliskannya). Sifatnya linear. Teknik yang dipakai: substitusi,
+% parsial, trigonometri, dan pecahan parsial.
+% 
+>$showev('integrate(x^n,x))
+Answering "Is n equal to -1?" with "no"
+ %image% TugasAplikom6_Ridwan25030630091-056.png
+% // latex: \int {x^{n}}{\;dx}=\frac{x^{n+1}}{n+1}
+>$showev('integrate(1/(1+x^2),x))
+ %image% TugasAplikom6_Ridwan25030630091-057.png
+% // latex: \int {\frac{1}{x^2+1}}{\;dx}=\arctan x
+>$showev('integrate(1/sqrt(1-x^2),x))
+ %image% TugasAplikom6_Ridwan25030630091-058.png
+% // latex: \int {\frac{1}{\sqrt{1-x^2}}}{\;dx}=\arcsin x
+% Untuk x^n Maxima bertanya apakah n = -1, karena untuk n = -1 hasilnya
+% ln|x|, bukan x^(n+1)/(n+1). Dua lainnya adalah arctan x dan arcsin x.
+% 
+% Fungsi yang antiturunannya tidak berbentuk elementer:
+>function map ee(x) &= E^(-x^2)
+
+                                    2
+                                 - x
+                                E
+
+>$showev('integrate(ee(x),x))
+ %image% TugasAplikom6_Ridwan25030630091-059.png
+% // latex: \int {e^ {- x^2 }}{\;dx}=\frac{\sqrt{\pi}\,\mathrm{erf}\left(x  \right)}{2}
+% Hasilnya memuat erf (fungsi galat), yang sendiri didefinisikan sebagai
+% integral e^(-x^2). Jadi ini bukan rumus dasar.
+% 
+% ** Latihan 4: lima integral
+% 
+% Soal 1 (suku banyak):
+% 
+% latex: \int (3x^2+2x-1)\,dx
+% %image% TugasAplikom6_Ridwan25030630091-060.png
+% // latex: \int (3x^2+2x-1)\,dx
+>$showev('integrate(3*x^2+2*x-1,x))
+ %image% TugasAplikom6_Ridwan25030630091-061.png
+% // latex: \int {3\,x^2+2\,x-1}{\;dx}=x^3+x^2-x
+% Penjelasan: tiap suku dinaikkan pangkatnya: x^3 + x^2 - x + C.
+% 
+% Soal 2 (substitusi):
+% 
+% latex: \int 2x\cos(x^2)\,dx
+% %image% TugasAplikom6_Ridwan25030630091-062.png
+% // latex: \int 2x\cos(x^2)\,dx
+>$showev('integrate(2*x*cos(x^2),x))
+ %image% TugasAplikom6_Ridwan25030630091-063.png
+% // latex: 2\,\int {x\,\cos x^2}{\;dx}=\sin x^2
+>$showev('diff(sin(x^2),x))
+ %image% TugasAplikom6_Ridwan25030630091-064.png
+% // latex: \frac{d}{d\,x}\,\sin x^2=2\,x\,\cos x^2
+% Penjelasan: u = x^2, du = 2x dx, jadi integralnya cos u du = sin u + C
+% = sin(x^2) + C. Baris kedua mengecek: turunannya kembali ke 2x
+% cos(x^2).
+% 
+% Soal 3 (parsial):
+% 
+% latex: \int x e^{x}\,dx
+% %image% TugasAplikom6_Ridwan25030630091-065.png
+% // latex: \int x e^{x}\,dx
+>$showev('integrate(x*exp(x),x))
+ %image% TugasAplikom6_Ridwan25030630091-066.png
+% // latex: \int {x\,e^{x}}{\;dx}=\left(x-1\right)\,e^{x}
+>$showev('diff((x-1)*exp(x),x))
+ %image% TugasAplikom6_Ridwan25030630091-067.png
+% // latex: \frac{d}{d\,x}\,\left(\left(x-1\right)\,e^{x}\right)=\left(x-1  \right)\,e^{x}+e^{x}
+% Penjelasan: u = x, dv = e^x dx, rumus latex: \int u\,dv=uv-\int v\,du
+% memberi x e^x - e^x = (x-1)e^x + C. Turunannya kembali ke x e^x.
+% 
+% Soal 4 (trigonometri):
+% 
+% latex: \int \sin^3 x\,dx
+% %image% TugasAplikom6_Ridwan25030630091-068.png
+% // latex: \int \sin^3 x\,dx
+>$showev('integrate(sin(x)^3,x))
+ %image% TugasAplikom6_Ridwan25030630091-069.png
+% // latex: \int {\sin ^3x}{\;dx}=\frac{\cos ^3x}{3}-\cos x
+% Penjelasan: sin^3 x = sin x (1 - cos^2 x). Dengan u = cos x, hasilnya
+% -cos x + (cos^3 x)/3 + C, sama dengan keluaran Maxima.
+% 
+% Soal 5 (pecahan parsial):
+% 
+% latex: \int \frac{1}{x^2-1}\,dx
+% %image% TugasAplikom6_Ridwan25030630091-070.png
+% // latex: \int \frac{1}{x^2-1}\,dx
+>$partfrac(1/(x^2-1),x)
+ %image% TugasAplikom6_Ridwan25030630091-071.png
+% // latex: \frac{1}{2\,\left(x-1\right)}-\frac{1}{2\,\left(x+1\right)}
+>$showev('integrate(1/(x^2-1),x))
+ %image% TugasAplikom6_Ridwan25030630091-072.png
+% // latex: \int {\frac{1}{x^2-1}}{\;dx}=\frac{\log \left(x-1\right)}{2}-\frac{  \log \left(x+1\right)}{2}
+% Penjelasan: 1/(x^2-1) dipecah jadi (1/2)/(x-1) - (1/2)/(x+1), lalu
+% tiap bagian diintegralkan: (1/2) ln|x-1| - (1/2) ln|x+1| + C.
+% 
+% * 5. Integral Tentu dan Aplikasinya
+% 
+% Integral tentu adalah luas bertanda di bawah kurva, didefinisikan
+% sebagai limit jumlah Riemann:
+%% latex: \int_a^b f(x)\,dx=\lim_{n\to\infty}\sum_{i=1}^n f(x_i^*)\Delta x.
+% %image% TugasAplikom6_Ridwan25030630091-073.png
+% // latex: \int_a^b f(x)\,dx=\lim_{n\to\infty}\sum_{i=1}^n f(x_i^*)\Delta x.
+% 
+% Teorema Dasar Kalkulus (TDK): 
+% 
+% latex: \int_a^b f(x)\,dx=F(b)-F(a),\quad F'=f.
+% %image% TugasAplikom6_Ridwan25030630091-074.png
+% // latex: \int_a^b f(x)\,dx=F(b)-F(a),\quad F'=f.
+% 
+>$showev('integrate(sin(x),x,0,pi))
+ %image% TugasAplikom6_Ridwan25030630091-075.png
+% // latex: \int_{0}^{\pi}{\sin x\;dx}=2
+>$showev('integrate(x*exp(-x),x,0,1))
+ %image% TugasAplikom6_Ridwan25030630091-076.png
+% // latex: \int_{0}^{1}{x\,e^ {- x }\;dx}=1-2\,e^ {- 1 }
+>integrate("x*exp(-x)",0,1)
+0.264241117657
+% Dua cara: Maxima memberi eksak 1-2/e, sedangkan integrate milik EMT
+% memberi hampiran numerik 0,2642. Keduanya harus sama.
+% 
+% ** Jumlah Riemann dan integral yang tidak eksak (contoh dosen)
+% 
+% latex: \int_0^{\pi}e^{-x^2}\,dx
+% %image% TugasAplikom6_Ridwan25030630091-077.png
+% // latex: \int_0^{\pi}e^{-x^2}\,dx
+>function ee2(x) := exp(-x^2)
+>xs=0:0.1:pi-0.1; plot2d(xs,ee2(xs+0.1),>bar); plot2d("ee2(x)",0,pi,>add):
+ %image% TugasAplikom6_Ridwan25030630091-078.png
+>0.1*sum(ee2(xs+0.1))
+0.836219610253
+>integrate("ee2(x)",0,pi)
+0.886219059173
+>$showev('integrate(ee(x),x,0,inf))
+ %image% TugasAplikom6_Ridwan25030630091-079.png
+% // latex: \int_{0}^{\infty }{e^ {- x^2 }\;dx}=\frac{\sqrt{\pi}}{2}
+% Jumlah luas persegi panjang 0,8362, sedangkan integrate memberi
+% 0,8862. Kalau lebarnya dikecilkan, jumlah Riemann mendekati nilai
+% integrate. Yang unik: batas berhingga tidak bisa eksak, tapi batas
+% tak hingga malah eksak, yaitu akar(pi)/2.
+% 
+>function xx(x) := x^x
+>integrate("xx(x)",0,1)
+0.783430510712
+>integrate("fz(x)",0,1)
+0.542581176074
+% Dua integral lain yang tidak punya bentuk eksak sederhana: x^x dari 0
+% sampai 1 (sekitar 0,7834) dan sin(3x^5+7)^2 dari 0 sampai 1 (sekitar
+% 0,5426).
+% 
+% ** Latihan 5: lima soal
+% 
+% Soal 1:
+%% integral x^2 pada [0,3] dengan TDK dan EMT.
+% 
+% latex: \int_0^3 x^2\,dx=\left[\tfrac{x^3}{3}\right]_0^3=\tfrac{27}{3}-0=9
+% %image% TugasAplikom6_Ridwan25030630091-080.png
+% // latex: \int_0^3 x^2\,dx=\left[\tfrac{x^3}{3}\right]_0^3=\tfrac{27}{3}-0=9
+>$showev('integrate(x^2,x,0,3))
+ %image% TugasAplikom6_Ridwan25030630091-081.png
+% // latex: \int_{0}^{3}{x^2\;dx}=9
+>integrate("x^2",0,3)
+9
+% Penjelasan: dengan TDK, F(x) = x^3/3 sehingga F(3)-F(0) = 9. Maxima
+% dan integrate EMT sama-sama memberi 9.
+% 
+% Soal 2:
+%% luas daerah antara y = x dan y = x^2 pada [0,1].
+% 
+% latex: L=\int_0^1 (x-x^2)\,dx
+% %image% TugasAplikom6_Ridwan25030630091-082.png
+% // latex: L=\int_0^1 (x-x^2)\,dx
+>plot2d(["x","x^2"],0,1,color=[blue,red]):
+ %image% TugasAplikom6_Ridwan25030630091-083.png
+>$showev('integrate(x-x^2,x,0,1))
+ %image% TugasAplikom6_Ridwan25030630091-084.png
+% // latex: \int_{0}^{1}{x-x^2\;dx}=\frac{1}{6}
+% Penjelasan: pada [0,1] garis y = x ada di atas parabola, jadi luas =
+% integral (atas - bawah) = 1/2 - 1/3 = 1/6.
+% 
+% Soal 3:
+%% volume benda putar y = akar(x), 0<=x<=4, terhadap sumbu-x.
+% 
+% latex: V=\pi\int_0^4 (\sqrt{x})^2\,dx=\pi\int_0^4 x\,dx
+% %image% TugasAplikom6_Ridwan25030630091-085.png
+% // latex: V=\pi\int_0^4 (\sqrt{x})^2\,dx=\pi\int_0^4 x\,dx
+>plot3d("sqrt(x)",a=0,b=4,rotate=1,grid=10):
+ %image% TugasAplikom6_Ridwan25030630091-086.png
+>$showev('pi*integrate(x,x,0,4))
+ %image% TugasAplikom6_Ridwan25030630091-087.png
+% // latex: 8\,\pi=8\,\pi
+>pi*integrate("x",0,4)
+25.1327412287
+% Penjelasan: metode cakram, V = pi * integral x dx = pi * 16/2 = 8 pi,
+% sekitar 25,1327. Hasil simbolik dan numerik sama.
+% 
+% Soal 4:
+%% bandingkan numerik dan simbolik untuk e^(-x^2) pada [0,1].
+% 
+% latex: \int_0^1 e^{-x^2}\,dx
+% %image% TugasAplikom6_Ridwan25030630091-088.png
+% // latex: \int_0^1 e^{-x^2}\,dx
+>integrate("ee2(x)",0,1)
+0.746824132812
+>$showev('integrate(ee(x),x,0,1))
+ %image% TugasAplikom6_Ridwan25030630091-089.png
+% // latex: \int_{0}^{1}{e^ {- x^2 }\;dx}=\frac{\sqrt{\pi}\,\mathrm{erf}\left(1  \right)}{2}
+>$float(sqrt(pi)/2*erf(1))
+ %image% TugasAplikom6_Ridwan25030630091-090.png
+% // latex: 0.7468241328124269
+% Penjelasan: numeriknya 0,746824. Maxima menjawab dengan erf, yaitu
+% akar(pi)/2 * erf(1), dan kalau dihitung desimal hasilnya sama
+% 0,746824. Jadi bedanya hanya bentuk: yang eksak memakai fungsi khusus,
+% yang numerik langsung angka.
+% 
+% Soal 5:
+%% panjang kurva y = x^2 pada [0,1].
+% 
+% latex: S=\int_0^1\sqrt{1+(2x)^2}\,dx
+% %image% TugasAplikom6_Ridwan25030630091-091.png
+% // latex: S=\int_0^1\sqrt{1+(2x)^2}\,dx
+>$showev('integrate(sqrt(1+diff(x^2,x)^2),x,0,1))
+ %image% TugasAplikom6_Ridwan25030630091-092.png
+% // latex: \int_{0}^{1}{\sqrt{4\,x^2+1}\;dx}=\frac{{\rm asinh}\; 2+2\,\sqrt{5}  }{4}
+>$float(%)
+ %image% TugasAplikom6_Ridwan25030630091-093.png
+% // latex: \int_{0.0}^{1.0}{\sqrt{4.0\,x^2+1.0}\;dx}=1.478942857544598
+% Penjelasan: hasil eksaknya (asinh(2)+2 akar(5))/4, sekitar 1,4789.
+% 
+% ** Panjang kurva
+% 
+% Prinsipnya: kurva dipotong jadi potongan kecil ds yang dianggap garis
+% lurus, lalu dijumlahkan dari A ke B.
+% 
+% latex: ds=\sqrt{dx^2+dy^2},\quad S=\int ds. latex: S=\int_a^b\sqrt{1+(f'(x))^2}\,dx,\qquad S=\int_{t_0}^{t_1}\sqrt{x'(t)^2+y'(t)^2}\,dt.
+% %image% TugasAplikom6_Ridwan25030630091-094.png
+% // latex: ds=\sqrt{dx^2+dy^2},\quad S=\int ds. latex: S=\int_a^b\sqrt{1+(f'(x))^2}\,dx,\qquad S=\int_{t_0}^{t_1}\sqrt{x'(t)^2+y'(t)^2}\,dt.
+% 
+% Contoh, parabola y = x^2 dari -1 sampai 1:
+>$showev('integrate(sqrt(1+diff(x^2,x)^2),x,-1,1))
+ %image% TugasAplikom6_Ridwan25030630091-095.png
+% // latex: \int_{-1}^{1}{\sqrt{4\,x^2+1}\;dx}=\frac{{\rm asinh}\; 2+2\,\sqrt{5  }}{2}
+>$float(%)
+ %image% TugasAplikom6_Ridwan25030630091-096.png
+% // latex: \int_{-1.0}^{1.0}{\sqrt{4.0\,x^2+1.0}\;dx}=2.957885715089195
+% Eksaknya sekitar 2,9579.
+% 
+% Supaya bisa dipakai untuk kurva apa saja, saya buat fungsi umum.
+% Bedanya dengan cara di atas, fungsi ini menjumlahkan panjang ruas
+% garis kecil di sepanjang kurva (2000 titik), jadi tidak perlu Maxima.
+>function panjangkurva (fx$,fy$,a,b,n=2000) ...
+$  tt=linspace(a,b,n);
+$  X=fx$(tt); Y=fy$(tt);
+$  i=1:n-1;
+$  return sum(sqrt((X[i+1]-X[i])^2+(Y[i+1]-Y[i])^2));
+$endfunction
+>panjangkurva("x","x^2",-1,1)
+2.95565039242
+>panjangkurva("x*cos(x)","x*sin(x)",0,2*pi)
+21.2363001506
+% Hasilnya 2,9579 (cocok dengan cara eksak) dan 21,2563 (spiral
+% Archimedes).
+% 
+% ** Keliling lingkaran dan keliling elips
+% 
+% Tugas dosen: buktikan keliling lingkaran 2 pi R.
+% 
+% latex: x=R\cos t,\; y=R\sin t,\; 0\le t\le 2\pi.
+% %image% TugasAplikom6_Ridwan25030630091-097.png
+% // latex: x=R\cos t,\; y=R\sin t,\; 0\le t\le 2\pi.
+>&assume(R>0);
+>fxl &= R*cos(t); fyl &= R*sin(t);
+>dsl &= radcan(sqrt(diff(fxl,t)^2+diff(fyl,t)^2)); $dsl
+ %image% TugasAplikom6_Ridwan25030630091-098.png
+% // latex: \sqrt{\sin ^2t+\cos ^2t}\,R
+>$showev('integrate(dsl,t,0,2*pi))
+ %image% TugasAplikom6_Ridwan25030630091-099.png
+% // latex: \left(\int_{0}^{2\,\pi}{\sqrt{\sin ^2t+\cos ^2t}\;dt}\right)\,R=2\,  \pi\,R
+% Elemen panjangnya ds = R dt (karena sin^2 + cos^2 = 1), jadi
+% kelilingnya R kali 2 pi = 2 pi R. Terbukti.
+% 
+% Elips x = 3 cos t, y = 2 sin t:
+% 
+% latex: K=\int_0^{2\pi}\sqrt{9\sin^2t+4\cos^2t}\,dt
+% %image% TugasAplikom6_Ridwan25030630091-100.png
+% // latex: K=\int_0^{2\pi}\sqrt{9\sin^2t+4\cos^2t}\,dt
+>integrate("sqrt(9*sin(x)^2+4*cos(x)^2)",0,2*pi)
+15.8654395893
+>pi*(3*(3+2)-sqrt((3*3+2)*(3+3*2)))
+15.8654375756
+% Integral ini tidak punya hasil eksak sederhana, jadi dihitung numerik:
+% sekitar 15,865. Baris kedua rumus hampiran Ramanujan memberi angka
+% yang sangat dekat. Jadi tidak ada rumus keliling elips yang "rapi"
+% seperti 2 pi R pada lingkaran.
+% 
+% * Kurva polar dan sikloid
+% ** contoh
+% 
+% latex: r(t)=1+\frac{\sin 3t}{2},\; 0\le t\le 2\pi.
+% %image% TugasAplikom6_Ridwan25030630091-101.png
+% // latex: r(t)=1+\frac{\sin 3t}{2},\; 0\le t\le 2\pi.
+>function rp(t) &= 1+sin(3*t)/2
+
+                             sin(3 t)
+                             -------- + 1
+                                2
+
+>function fx2(t) &= rp(t)*cos(t)
+
+                                sin(3 t)
+                        cos(t) (-------- + 1)
+                                   2
+
+>function fy2(t) &= rp(t)*sin(t)
+
+                                sin(3 t)
+                        sin(t) (-------- + 1)
+                                   2
+
+>function ds(t) &= trigreduce(radcan(sqrt(diff(fx2(t),t)^2+diff(fy2(t),t)^2)))
+
+                  sqrt(4 cos(6 t) + 4 sin(3 t) + 9)
+                  ---------------------------------
+                                  2
+
+>integrate("ds(x)",0,2*pi)
+9.0749467823
+>tt=linspace(0,2pi,1000); px=rp(tt)*cos(tt); py=rp(tt)*sin(tt); plot2d(px,py,>filled,fillcolor=red,style="/",r=1.5):
+ %image% TugasAplikom6_Ridwan25030630091-102.png
+% Maxima gagal menghitung integral ds secara eksak, jadi dipakai
+% integrate numerik: panjangnya 9,0749. Gambarnya mawar berdaun tiga.
+% 
+% Sikloid: lintasan satu titik di tepi roda yang menggelinding.
+% 
+% latex: x=R(t-\sin t),\; y=R(1-\cos t),\quad R=1.
+% %image% TugasAplikom6_Ridwan25030630091-103.png
+% // latex: x=R(t-\sin t),\; y=R(1-\cos t),\quad R=1.
+>ex &= x-sin(x); ey &= 1-cos(x);
+>dss &= trigsimp(radcan(sqrt(diff(ex,x)^2+diff(ey,x)^2))); $dss
+ %image% TugasAplikom6_Ridwan25030630091-104.png
+% // latex: \sqrt{2-2\,\cos x}
+>$showev('integrate(dss,x,0,2*pi))
+ %image% TugasAplikom6_Ridwan25030630091-105.png
+% // latex: \int_{0}^{2\,\pi}{\sqrt{2-2\,\cos x}\;dx}=8
+>plot2d(ex,ey,xmin=0,xmax=4pi,square=1):
+ %image% TugasAplikom6_Ridwan25030630091-106.png
+% Panjang satu putaran sikloid adalah 8, lebih panjang dari keliling
+% lingkaran 2 pi = 6,28. Ini salah paham yang umum: lintasan titik di
+% tepi roda tidak sama dengan keliling roda. Odometer mengukur jarak
+% dari jumlah putaran roda kali keliling, bukan dari lintasan titik itu.
+% 
+% ** Folium Descartes dan spiral logaritmik
+% 
+% latex: x^3+y^3-3xy=0,\quad x=\frac{3L}{L^3+1},\; y=Lx.
+% %image% TugasAplikom6_Ridwan25030630091-107.png
+% // latex: x^3+y^3-3xy=0,\quad x=\frac{3L}{L^3+1},\; y=Lx.
+>plot2d("x^3+y^3-3*x*y",r=3,level=0,n=200):
+ %image% TugasAplikom6_Ridwan25030630091-108.png
+>2*panjangkurva("3*x/(x^3+1)","3*x^2/(x^3+1)",0,1)
+4.91642754427
+% Kurvanya simetris terhadap garis y = x, jadi cukup hitung L dari 0
+% sampai 1 lalu dikali 2. Panjang simpul (loop) sekitar 4,92.
+% 
+% Spiral logaritmik r = e^(a t). Saya cek rumus panjangnya dengan a =
+% 0,1 untuk 0<=t<=2 pi:
+% 
+% latex: S=\frac{\sqrt{1+a^2}}{a}\left(e^{a\theta}-1\right)
+% %image% TugasAplikom6_Ridwan25030630091-109.png
+% // latex: S=\frac{\sqrt{1+a^2}}{a}\left(e^{a\theta}-1\right)
+>panjangkurva("exp(0.1*x)*cos(x)","exp(0.1*x)*sin(x)",0,2*pi)
+8.78225408621
+>a=0.1; sqrt(1+a^2)/a*(exp(2*pi*a)-1)
+8.78817491636
+% Dua angkanya sama, sekitar 8,788, jadi rumusnya cocok.
+% 
+% ** Kurvatur (kelengkungan)
+% 
+% Kurvatur mengukur seberapa tajam kurva membelok, yaitu kebalikan
+% jari-jari lingkaran oskulasi (lingkaran yang paling pas menyinggung
+% kurva di titik itu):
+% 
+% latex: \kappa=\frac1R,\qquad \kappa(x)=\frac{|f''(x)|}{(1+f'(x)^2)^{3/2}}.
+% %image% TugasAplikom6_Ridwan25030630091-110.png
+% // latex: \kappa=\frac1R,\qquad \kappa(x)=\frac{|f''(x)|}{(1+f'(x)^2)^{3/2}}.
+% 
+% Lingkaran jari-jari R kurvaturnya 1/R (konstan).
+% 
+% ** Contoh
+% 
+% latex: y= x^2+x+1:
+% %image% TugasAplikom6_Ridwan25030630091-111.png
+% // latex: y= x^2+x+1:
+>function ff(x) &= x^2+x+1
+
+                               2
+                              x  + x + 1
+
+>function kk(x) &= (diff(ff(x),x,2))/(1+diff(ff(x),x)^2)^(3/2)
+
+                                  2
+                         -------------------
+                                   2     3/2
+                         ((2 x + 1)  + 1)
+
+>$kk(x)
+ %image% TugasAplikom6_Ridwan25030630091-112.png
+% // latex: \frac{2}{\left(\left(2\,x+1\right)^2+1\right)^{\frac{3}{2}}}
+>kk(-1/2), 1/kk(-1/2)
+2
+0.5
+>plot2d("ff(x)",-1.5,0.5,square=1); plot2d("-1/2+0.5*cos(x)","5/4+0.5*sin(x)",xmin=0,xmax=2pi,>add,color=blue):
+ %image% TugasAplikom6_Ridwan25030630091-113.png
+% Di puncak parabola (-1/2, 3/4) kurvaturnya 2 dan jari-jarinya 1/2.
+% Pusat lingkaran oskulasinya di (-1/2, 5/4). Lingkaran biru menyinggung
+% parabola persis di puncaknya.
+% 
+% Versi implisit untuk y = x^2 (F(x,y) = x^2 - y = 0):
+% 
+% latex: \kappa=\frac{F_y^2F_{xx}-2F_xF_yF_{xy}+F_x^2F_{yy}}{(F_x^2+F_y^2)^{3/2}}
+% %image% TugasAplikom6_Ridwan25030630091-114.png
+% // latex: \kappa=\frac{F_y^2F_{xx}-2F_xF_yF_{xy}+F_x^2F_{yy}}{(F_x^2+F_y^2)^{3/2}}
+>Fi &= x^2-y
+
+                                 2
+                                x  - y
+
+>Fx &= diff(Fi,x); Fy &= diff(Fi,y); Fxx &= diff(Fi,x,2); Fyy &= diff(Fi,y,2); Fxy &= diff(diff(Fi,x),y);
+>kap &= (Fy^2*Fxx-2*Fx*Fy*Fxy+Fx^2*Fyy)/(Fx^2+Fy^2)^(3/2); $kap
+ %image% TugasAplikom6_Ridwan25030630091-115.png
+% // latex: \frac{2}{\left(4\,x^2+1\right)^{\frac{3}{2}}}
+>&subst([x=0,y=0],kap)
+
+                                  2
+
+% Hasilnya 2/(4x^2+1)^(3/2), sama dengan rumus untuk y = f(x). Di (0,0)
+% kurvaturnya 2, jadi jari-jari lingkaran oskulasi 1/2.
+% 
+% * 6. Barisan dan Deret
+% 
+% Barisan adalah daftar bilangan berurutan, deret adalah jumlah suku-
+% sukunya. Barisan konvergen kalau limit a_n ada dan berhingga, selain
+% itu divergen.
+% 
+% latex: S_n=\sum_{k=1}^n a_k,\qquad \sum_{k=1}^\infty a_k=\lim_{n\to\infty}S_n. latex: \sum_{k=0}^{n-1}ar^k=\frac{a(1-r^n)}{1-r},\qquad \sum_{k=0}^\infty ar^k=\frac{a}{1-r}\ (|r|<1).
+% %image% TugasAplikom6_Ridwan25030630091-116.png
+% // latex: S_n=\sum_{k=1}^n a_k,\qquad \sum_{k=1}^\infty a_k=\lim_{n\to\infty}S_n. latex: \sum_{k=0}^{n-1}ar^k=\frac{a(1-r^n)}{1-r},\qquad \sum_{k=0}^\infty ar^k=\frac{a}{1-r}\ (|r|<1).
+% 
+% ** Cara membuat barisan di EMT
+% 
+% Cara paling sederhana pakai titik dua (1:10 atau 1:2:30). Untuk
+% barisan rekursif ada sequence dan iterate.
+>1:2:30
+[1,  3,  5,  7,  9,  11,  13,  15,  17,  19,  21,  23,  25,  27,  29]
+>sequence("x[n-1]+x[n-2]",[1,1],15)
+[1,  1,  2,  3,  5,  8,  13,  21,  34,  55,  89,  144,  233,  377,  610]
+>q=1.05; iterate("x*q",1000,n=10)'
+         1000 
+         1050 
+       1102.5 
+      1157.63 
+      1215.51 
+      1276.28 
+       1340.1 
+       1407.1 
+      1477.46 
+      1551.33 
+      1628.89 
+% Baris kedua barisan Fibonacci. Baris ketiga pertumbuhan 5% tiap
+% periode mulai dari 1000.
+% 
+% Fibonacci dan pecahan emas (contoh dosen):
+>plot2d(sequence("x[n-1]+x[n-2]",[1,1],250)^(1/(1:250))):
+ %image% TugasAplikom6_Ridwan25030630091-117.png
+>$float((1+sqrt(5))/2)
+ %image% TugasAplikom6_Ridwan25030630091-118.png
+% // latex: 1.618033988749895
+% Akar pangkat n dari suku ke-n Fibonacci mendekati 1,618 (pecahan
+% emas), terlihat dari grafik yang makin mendatar.
+% 
+% Barisan yang selalu menuju akar 2:
+% 
+% latex: x_{n+1}=\frac{x_n+2/x_n}{2}
+% %image% TugasAplikom6_Ridwan25030630091-119.png
+% // latex: x_{n+1}=\frac{x_n+2/x_n}{2}
+>function f2(x) := (x+2/x)/2
+>iterate("f2",2,5), sqrt(2)
+[2,  1.5,  1.41667,  1.41422,  1.41421,  1.41421]
+1.41421356237
+>function hiter(f$,x0) ...
+$  x=x0; n=0;
+$  repeat
+$    y=f$(x); n=n+1;
+$    if abs(y-x)<1e-10 then break; endif;
+$    if n>1000 then break; endif;
+$    x=y;
+$  end;
+$  return n;
+$endfunction
+>hiter("(x+2/x)/2",2), hiter("(x+2/x)/2",10)
+5
+8
+>iterate("cos(x)",1)
+0.739085133216
+% Dari nilai awal 2 barisannya 2; 1,5; 1,4167; ... menuju akar 2.
+% Keunikannya, nilai awal berapa pun (selain nol) tetap menuju akar 2.
+% hiter menghitung berapa iterasi sampai berhenti berubah. Iterasi
+% cos(x) menuju 0,7391, yaitu penyelesaian x = cos(x).
+% 
+% Akar yang ditarik berulang-ulang:
+>iterate("sqrt(x)",100,n=10)'
+          100 
+           10 
+      3.16228 
+      1.77828 
+      1.33352 
+      1.15478 
+      1.07461 
+      1.03663 
+      1.01815 
+      1.00904 
+      1.00451 
+>iterate("sqrt(x)",0.01,n=10)'
+         0.01 
+          0.1 
+     0.316228 
+     0.562341 
+     0.749894 
+     0.865964 
+     0.930572 
+     0.964662 
+     0.982172 
+     0.991046 
+     0.995513 
+% Bilangan 100 maupun 0,01 sama-sama menuju 1. Memang x^(1/2^n) menuju 1
+% untuk semua x>0, baik besar maupun pecahan.
+% 
+% ** Latihan 6
+% 
+% Soal 1:
+%% limit barisan 1/n dan (-1)^n.
+% 
+% latex: a_n=\frac1n,\qquad b_n=(-1)^n
+% %image% TugasAplikom6_Ridwan25030630091-120.png
+% // latex: a_n=\frac1n,\qquad b_n=(-1)^n
+>$showev('limit(1/n,n,inf))
+ %image% TugasAplikom6_Ridwan25030630091-121.png
+% // latex: \lim_{n\rightarrow \infty }{\frac{1}{n}}=0
+>$showev('limit((-1)^n,n,inf))
+ %image% TugasAplikom6_Ridwan25030630091-122.png
+% // latex: \lim_{n\rightarrow \infty }{\left(-1\right)^{n}}={\it ind}
+>n=1:20; plot2d(n,(-1)^n,>points):
+ %image% TugasAplikom6_Ridwan25030630091-123.png
+% Penjelasan: 1/n menuju 0 (konvergen). (-1)^n loncat antara -1 dan 1
+% terus, tidak mendekati satu nilai, jadi divergen (Maxima memberi ind).
+% 
+% Soal 2: sepuluh suku pertama Fibonacci.
+>sequence("x[n-1]+x[n-2]",[1,1],10)
+[1,  1,  2,  3,  5,  8,  13,  21,  34,  55]
+% Penjelasan: 1, 1, 2, 3, 5, 8, 13, 21, 34, 55. Tiap suku adalah jumlah
+% dua suku sebelumnya.
+% 
+% Soal 3:
+%% jumlah 6 suku pertama deret geometri, a = 1 dan r = 1/2.
+% 
+% latex: S_6=\sum_{k=0}^{5}\left(\tfrac12\right)^k=\frac{1-(1/2)^6}{1-1/2}=\frac{63}{32}
+% %image% TugasAplikom6_Ridwan25030630091-124.png
+% // latex: S_6=\sum_{k=0}^{5}\left(\tfrac12\right)^k=\frac{1-(1/2)^6}{1-1/2}=\frac{63}{32}
+>$'sum((1/2)^k,k,0,5)=ev(sum((1/2)^k,k,0,5),simpsum=true)
+ %image% TugasAplikom6_Ridwan25030630091-125.png
+% // latex: \sum_{k=0}^{5}{\frac{1}{2^{k}}}=\frac{63}{32}
+% Penjelasan: dengan rumus, (1-1/64)/(1/2) = 63/32 = 1,96875.
+% 
+% Soal 4:
+%% jumlah tak hingga dengan a = 1 dan r = 1/2.
+% 
+% latex: S=\frac{a}{1-r}=\frac{1}{1-1/2}=2
+% %image% TugasAplikom6_Ridwan25030630091-126.png
+% // latex: S=\frac{a}{1-r}=\frac{1}{1-1/2}=2
+>$'sum((1/2)^k,k,0,inf)=ev(sum((1/2)^k,k,0,inf),simpsum=true)
+ %image% TugasAplikom6_Ridwan25030630091-127.png
+% // latex: \sum_{k=0}^{\infty }{\frac{1}{2^{k}}}=2
+% Penjelasan: |r| < 1 jadi deretnya konvergen ke 2.
+% 
+% Soal 5: jumlah parsial dan grafiknya.
+>n=0:9; a=(1/2)^n; cumsum(a)
+[1,  1.5,  1.75,  1.875,  1.9375,  1.96875,  1.98438,  1.99219,
+1.99609,  1.99805]
+>plot2d(n,cumsum(a),>points); plot2d(n,2+0*n,>add,color=red):
+ %image% TugasAplikom6_Ridwan25030630091-128.png
+% Penjelasan: jumlah parsialnya 1; 1,5; 1,75; 1,875; ... Titik-titik
+% naik mendekati garis merah y = 2 tetapi tidak pernah melewatinya.
+% 
+% ** Tambahan: deret p dan deret Taylor
+% 
+% Maxima bisa membuktikan deret 1/k^2 jumlahnya pi^2/6:
+>$'sum(1/k^2,k,1,inf)=ev(sum(1/k^2,k,1,inf),simpsum=true)
+ %image% TugasAplikom6_Ridwan25030630091-129.png
+% // latex: \sum_{k=1}^{\infty }{\frac{1}{k^2}}=\frac{\pi^2}{6}
+% Tidak semua deret berhasil dihitung Maxima. Kadang perlu asumsi
+% (assume) atau perintahnya dimodifikasi.
+% 
+% Deret Taylor:
+%% latex: f(x)=\sum_{k=0}^\infty\frac{f^{(k)}(a)}{k!}(x-a)^k
+% %image% TugasAplikom6_Ridwan25030630091-130.png
+% // latex: f(x)=\sum_{k=0}^\infty\frac{f^{(k)}(a)}{k!}(x-a)^k
+>$'sin(x)=taylor(sin(x),x,0,7)
+ %image% TugasAplikom6_Ridwan25030630091-131.png
+% // latex: \sin x=-\frac{x^7}{5040}+\frac{x^5}{120}-\frac{x^3}{6}+x
+>function t3(x) &= taylor(sin(x),x,0,3)
+
+                                     3
+                                    x
+                                x - --
+                                    6
+
+>function t7(x) &= taylor(sin(x),x,0,7)
+
+                            7     5     3
+                           x     x     x
+                        - ---- + --- - -- + x
+                          5040   120   6
+
+>plot2d(["sin(x)","t3(x)","t7(x)"],-pi,pi,color=[black,red,blue]):
+ %image% TugasAplikom6_Ridwan25030630091-132.png
+% Kalau titik ekspansi a = 0, namanya deret Maclaurin: sin x = x - x^3/6
+% + x^5/120 - x^7/5040 + ... Makin banyak suku, kurva hampiran (merah
+% lalu biru) makin menempel pada kurva sin x di sekitar x=0.
+% 
+% * 7. Fungsi Multivariabel
+% 
+% Fungsi dua variabel z = f(x,y) memberi satu nilai untuk setiap
+% pasangan (x,y); grafiknya berupa permukaan di ruang 3D. Turunan
+% parsial adalah turunan terhadap satu variabel dengan variabel lain
+% dianggap konstan: 
+% 
+% latex: f_x=\frac{\partial f}{\partial x},\quad f_y=\frac{\partial f}{\partial y},\quad df=f_x\,dx+f_y\,dy.
+% %image% TugasAplikom6_Ridwan25030630091-133.png
+% // latex: f_x=\frac{\partial f}{\partial x},\quad f_y=\frac{\partial f}{\partial y},\quad df=f_x\,dx+f_y\,dy.
+% 
+% Integral lipat dua menghitung volume di bawah permukaan:
+% 
+% latex: V=\iint_R f(x,y)\,dA.
+% %image% TugasAplikom6_Ridwan25030630091-134.png
+% // latex: V=\iint_R f(x,y)\,dA.
+% 
+% ** Grafik permukaan
+% 
+>plot3d("x^2+y^2",r=2,>hue,>spectral,>contour):
+ %image% TugasAplikom6_Ridwan25030630091-135.png
+>plot3d("x^2-y^2",r=2,>hue,>spectral):
+ %image% TugasAplikom6_Ridwan25030630091-136.png
+% Yang pertama paraboloida berbentuk mangkuk, garis konturnya lingkaran
+% sepusat. Yang kedua pelana: naik ke satu arah dan turun ke arah lain,
+% titik tengahnya (0,0) adalah titik pelana.
+% 
+% ** Latihan 7
+%% Soal 1:
+%% turunan parsial pertama dan kedua.
+% 
+% latex: f(x,y)=x^2y+y^3
+% %image% TugasAplikom6_Ridwan25030630091-137.png
+% // latex: f(x,y)=x^2y+y^3
+>function fm(x,y) &= x^2*y+y^3
+
+                               3    2
+                              y  + x  y
+
+>fmx &= diff(fm(x,y),x); fmy &= diff(fm(x,y),y);
+>$'f_x=fmx, $'f_y=fmy
+ %image% TugasAplikom6_Ridwan25030630091-138.png
+% // latex: {\it f\_\_x}=2\,x\,y
+ %image% TugasAplikom6_Ridwan25030630091-139.png
+% // latex: {\it f\_\_y}=3\,y^2+x^2
+>fmxx &= diff(fm(x,y),x,2); fmyy &= diff(fm(x,y),y,2); fmxy &= diff(diff(fm(x,y),x),y);
+>$'f_xx=fmxx, $'f_yy=fmyy, $'f_xy=fmxy
+ %image% TugasAplikom6_Ridwan25030630091-140.png
+% // latex: {\it f\_\_xx}=2\,y
+ %image% TugasAplikom6_Ridwan25030630091-141.png
+% // latex: {\it f\_\_yy}=6\,y
+ %image% TugasAplikom6_Ridwan25030630091-142.png
+% // latex: {\it f\_\_xy}=2\,x
+>&subst([x=1,y=2],fmx), &subst([x=1,y=2],fmy)
+
+                                  4
+
+
+                                  13
+
+% Penjelasan: fx = 2xy, fy = x^2+3y^2, fxx = 2y, fyy = 6y, fxy = 2x. Di
+% (1,2) nilai fx = 4 dan fy = 13, jadi gradiennya (4,13), arah naik
+% paling cepat.
+% 
+% Soal 2:
+%% diferensial total.
+%% latex: df=f_x\,dx+f_y\,dy=2xy\,dx+(x^2+3y^2)\,dy
+% %image% TugasAplikom6_Ridwan25030630091-143.png
+% // latex: df=f_x\,dx+f_y\,dy=2xy\,dx+(x^2+3y^2)\,dy
+>dz &= fmx*dx+fmy*dy; $'df=dz
+ %image% TugasAplikom6_Ridwan25030630091-144.png
+% // latex: {\it df}={\it dy}\,\left(3\,y^2+x^2\right)+2\,{\it dx}\,x\,y
+>&subst([x=1,y=2,dx=0.1,dy=-0.05],dz)
+
+                                - 0.25
+
+>fm(1.1,1.95)-fm(1,2)
+-0.225625
+% Penjelasan: dari (1,2) bergeser dx = 0,1 dan dy = -0,05, hampiran
+% perubahan fungsinya 4(0,1)+13(-0,05) = -0,25. Perubahan sebenarnya
+% -0,2256. Agak meleset karena pergeserannya belum terlalu kecil; makin
+% kecil dx dan dy, makin dekat.
+% 
+% 
+% Soal 3:
+%% makna hasilnya. Karena x^2+y^2 tidak pernah negatif, 10/3 adalah
+% volume benda di bawah permukaan z = x^2+y^2 dan di atas persegi
+% panjang 0<=x<=2, 0<=y<=1 (gambar terakhir).
+% 
+% Tambahan, titik kritis:
+%% latex: f(x,y)=x^2+y^2-2x-4y
+% %image% TugasAplikom6_Ridwan25030630091-145.png
+% // latex: f(x,y)=x^2+y^2-2x-4y
+>function fc(x,y) &= x^2+y^2-2*x-4*y
+
+                          2          2
+                         y  - 4 y + x  - 2 x
+
+>&solve([diff(fc(x,y),x)=0,diff(fc(x,y),y)=0],[x,y])
+
+                           [[x = 1, y = 2]]
+
+>fc(1,2)
+-5
+>plot3d("x^2+y^2-2*x-4*y",a=-1,b=3,c=0,d=4,>hue):
+ %image% TugasAplikom6_Ridwan25030630091-146.png
+>  
+% fx = 2x-2 = 0 dan fy = 2y-4 = 0 memberi titik (1,2) dengan nilai -5.
+% Dari grafik (mangkuk yang digeser) titik itu adalah minimum.
+% 
+% * Kesimpulan
+% 
+% Dari tugas ini saya melihat EMT bisa dipakai untuk hampir semua
+% materi kalkulus, dan ada pola kapan harus pakai simbolik atau
+% numerik:
+% 
+% 1. Fungsi: fungsi numerik (:=) cocok untuk nilai dan grafik, fungsi
+%    simbolik (&=) untuk rumus dan komposisi. Domain harus dicek, kalau
+%    tidak EMT memberi error.
+% 2. Limit: bentuk 0/0 bisa punya limit, dan limit kiri-kanan yang
+%    beda berarti limit tidak ada (|x-1|/(x-1), sin(1/x)).
+% 3. Turunan: dari definisi limit didapat rumus x^n, sin x, ln x, x^x,
+%    dan arcsin x. Titik stasioner dicari dari turunan = 0, lalu
+%    dicek dengan turunan kedua.
+% 4. Integral tak tentu: tiap hasil bisa dicek dengan menurunkannya
+%    kembali. Beberapa integral (e^(-x^2)) hanya bisa dinyatakan
+%    dengan fungsi khusus erf.
+% 5. Integral tentu: dipakai untuk luas (1/6), volume benda putar
+%    (8 pi), dan panjang kurva. Panjang kurva bisa eksak (lingkaran
+%    2 pi R, sikloid 8) atau harus numerik (elips 15,865, mawar
+%    polar 9,075). Kurvatur lingkaran jari-jari R adalah 1/R.
+% 6. Barisan dan deret: ada barisan yang menuju bilangan tertentu
+%    (pecahan emas, akar 2, 1 untuk akar berulang), deret geometri
+%    menuju a/(1-r), dan deret Taylor memberi hampiran fungsi.
+% 7. Fungsi multivariabel: turunan parsial, diferensial total, dan
+%    integral lipat dua (volume 10/3) memperluas konsep yang sama ke
+%    dua variabel.
+% 
+% Hal yang perlu diingat: hasil simbolik berguna untuk bentuk eksak,
+% tetapi kalau Maxima gagal (misalnya panjang elips) hasil numerik
+% tetap bisa dipakai. Grafik hanya pendukung untuk melihat pola,
+% bukan pembuktian. Beberapa sintaks Maxima juga bergantung pada
+% versi EMT dan asumsi variabelnya.

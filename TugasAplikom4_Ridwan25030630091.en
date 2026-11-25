@@ -1,0 +1,511 @@
+﻿% * Menggambar Grafik 2D dengan EMT
+% 
+% Nama  : Ridwan Maulana
+%% NIM   : 25030630091
+%% Kelas : Matematika F
+% 
+% 
+% Notebook ini membahas penggunaan Euler Math Toolbox (EMT) untuk
+% menggambar dan menganalisis berbagai grafik dua dimensi (2D)
+% menggunakan fungsi plot2d(). Materi mencakup 15 topik utama, mulai
+% dari grafik fungsi, beberapa kurva, pengaturan tampilan, hingga kurva
+% parametrik, implisit, dan fungsi kompleks. Setiap materi dilengkapi
+% teori singkat, contoh penyelesaian menggunakan EMT, serta penjelasan
+% hasil grafik.
+% 
+% Petunjuk Penggunaan Notebook
+%% - Baris yang diawali tanda > merupakan perintah EMT yang dijalankan
+% dengan menekan ENTER.
+%% - Baris yang diawali tanda % merupakan komentar atau penjelasan yang
+% tidak dieksekusi sebagai perintah.
+%% - Tanda : di akhir perintah digunakan untuk menampilkan hasil grafik
+% di dalam notebook, sedangkan ; digunakan untuk mengakhiri perintah
+% tanpa menampilkan hasil secara langsung.
+%% - Tanda ... menunjukkan bahwa perintah masih berlanjut ke baris
+% berikutnya.
+%% - Awalan & digunakan untuk melakukan perhitungan simbolik, sedangkan
+% perintah tanpa awalan tersebut umumnya digunakan untuk perhitungan
+% numerik.
+>reset;
+% 
+% * 1. Grafik fungsi satu variabel: ekspresi langsung
+% 
+% Grafik fungsi y = f(x) adalah himpunan titik (x, f(x)). Dengan plot2d cukup menuliskan
+% rumus f(x) di dalam tanda kutip.
+% 
+% - Ekspresi memakai variabel x dan ditulis di dalam tanda kutip.
+% - Rentang bawaan x adalah [-2, 2]; ubah dengan plot2d("...",a,b).
+% - Rentang y opsional: plot2d("...",a,b,c,d).
+% 
+% Soal: gambarlah grafik fungsi berikut.
+% latex: f(x)=x^3-x,\quad -2\le x\le 2
+>plot2d("x^3-x",-2,2):
+ %image% TugasApkom5&6_Ridwan25030630091-001.png
+% contoh dengan batas y:
+>plot2d("sin(x)",-2*pi,2*pi,-1.5,1.5):
+ %image% TugasApkom5&6_Ridwan25030630091-002.png
+% 
+% Penjelasan: Kurva berbentuk S dan memotong sumbu x di x = -1, 0, 1. Ada maksimum lokal
+% di x = -1/sqrt(3) dan minimum lokal di x = 1/sqrt(3).
+% 
+% * 2. Rumus disimpan di variabel ekspresi
+% 
+% Rumus yang sering dipakai dapat disimpan dalam variabel dengan &= (ekspresi simbolik),
+% lalu dipakai berulang tanpa tanda kutip.
+% 
+% - expr &= rumus menyimpan ekspresi simbolik.
+% - Dipakai langsung: plot2d(expr,a,b) (tanpa kutip).
+% - Bisa diturunkan: &diff(expr,x).
+% 
+% latex: f(x)=e^{-x}\sin x,\quad 0\le x\le 3\pi
+>expr &= sin(x)*exp(-x)
+
+                              - x
+                             E    sin(x)
+
+>plot2d(expr,0,3pi):
+ %image% TugasApkom5&6_Ridwan25030630091-003.png
+% 
+% Penjelasan: Ini osilasi teredam: amplitudo mengecil secara eksponensial. Kurva memotong
+% sumbu x di kelipatan pi dan nilai maksimumnya sekitar 0,32 di x = pi/4.
+% 
+% * 3. Fungsi numerik
+% 
+% Fungsi numerik didefinisikan dengan := dan menghasilkan bilangan desimal. Fungsi boleh
+% memiliki parameter tambahan yang dikirim lewat tanda titik koma.
+% 
+% - function f(x,a) := ... untuk fungsi numerik.
+% - Dipanggil dengan nama di dalam kutip: plot2d("f",...).
+% - Parameter tambahan setelah ; : plot2d("f",0,1;0.3).
+% 
+% latex: f(x)=\dfrac{x^2}{a}+ax^2-x,\quad a=0.3,\ 0\le x\le 1
+>function f(x,a) := x^2/a+a*x^2-x;
+>plot2d("f",0,1;0.3,title="a=0.3"):
+ %image% TugasApkom5&6_Ridwan25030630091-004.png
+% 
+% Penjelasan: Untuk a = 0,3 fungsinya menjadi f(x) sekitar 3,63x^2 - x, yaitu parabola
+% terbuka ke atas dengan nilai minimum sekitar -0,07 di x sekitar 0,14. Ganti 0.3 dengan
+% nilai lain untuk melihat perubahannya.
+% 
+% * 4. Fungsi simbolik
+% 
+% Fungsi simbolik didefinisikan dengan &=. Rumusnya dihitung eksak oleh Maxima (misalnya
+% turunan), dan nama fungsinya dapat langsung digambar.
+% 
+% - function f(x) &= ... membuat fungsi simbolik.
+% - Cukup tulis nama: plot2d(f,a,b) (tanpa kutip).
+% - Hasil turunan/integral eksak langsung bisa digambar.
+% 
+% latex: f(x)=\dfrac{d}{dx}\left(x^x\right)=x^x(\ln x+1)
+>function f(x) &= diff(x^x,x)
+
+                            x
+                           x  (log(x) + 1)
+
+>plot2d(f,0,2):
+ %image% TugasApkom5&6_Ridwan25030630091-005.png
+% 
+% Penjelasan: EMT mulai menggambar saat fungsi terdefinisi (x > 0). Untuk x mendekati 0
+% nilainya turun tajam ke -tak hingga, memotong sumbu x di x = 1/e, dan f(1) = 1.
+% 
+% * 5. Beberapa kurva sekaligus (panel terpisah)
+% 
+% Satu jendela gambar dapat dibagi menjadi beberapa panel dengan figure(baris,kolom); tiap
+% panel berisi satu grafik.
+% 
+% - figure(2,2) membagi jendela menjadi 2x2 panel.
+% - figure(k) memilih panel ke-k.
+% - figure(0) mengembalikan ke satu jendela penuh.
+% 
+% latex: y=x^n,\quad n=1,2,3,4
+>figure(2,2); ...
+>for n=1 to 4; figure(n); plot2d("x^"+n); end; ...
+>figure(0):
+ %image% TugasApkom5&6_Ridwan25030630091-006.png
+% 
+% Penjelasan: Pangkat ganjil (n = 1, 3) simetris terhadap titik asal, sedangkan pangkat
+% genap (n = 2, 4) simetris terhadap sumbu y.
+% 
+% * 6. Beberapa kurva dalam satu bidang koordinat
+% 
+% Ada dua cara: menulis vektor ekspresi ["f1","f2"], atau menambahkan kurva ke gambar yang
+% sudah ada dengan >add.
+% 
+% - Vektor ekspresi: plot2d(["sin(x)","cos(x)"],0,2pi).
+% - >add menimpa tanpa menghapus gambar sebelumnya.
+% - Pakai warna/gaya berbeda agar kurva mudah dibedakan.
+% 
+% latex: y=\sin x,\ y=\cos x,\ y=\sin 3x,\quad 0\le x\le 2\pi
+>plot2d(["sin(x)","cos(x)"],0,2pi,color=[black,blue]);
+>plot2d("sin(3*x)",>add,color=red,style="--");
+>labelbox(["sin","cos","sin 3x"],styles=["-","-","--"],colors=[black,blue,red]):
+ %image% TugasApkom5&6_Ridwan25030630091-007.png
+% 
+% Penjelasan: sin x dan cos x berpotongan di x = pi/4 dan 5pi/4. Kurva sin 3x berosilasi
+% tiga kali lebih cepat (periode 2pi/3).
+% 
+% * 7. Label sumbu, label kurva, dan keterangan (legend)
+% 
+% Gambar yang baik perlu judul, nama sumbu, penanda titik penting, dan legend agar mudah
+% dibaca.
+% 
+% - title=, xl=, yl= : judul dan label sumbu.
+% - label("teks",x,y) : tulisan di titik tertentu.
+% - labelbox(nama,styles,colors) : legend.
+% 
+% latex: f(x)=x^3-x,\qquad f'(x)=3x^2-1
+>function f(x) &= x^3-x
+
+                                 3
+                                x  - x
+
+>plot2d(&f(x),-1,1,-1,2,title="y = x^3 - x",xl="x",yl="y");
+>plot2d(&diff(f(x),x),>add,style="--",color=blue);
+>x0=fmin(f,0,1); label("Rel. Min.",x0,f(x0),pos="lc");
+>labelbox(["f","f'"],["-","--"],[black,blue]):
+ %image% TugasApkom5&6_Ridwan25030630091-008.png
+% 
+% Penjelasan: Titik merah adalah minimum lokal di x = 1/sqrt(3) sekitar 0,577 dengan f
+% sekitar -0,385. Di titik itu kurva putus-putus f' memotong sumbu x, artinya f'(x) = 0.
+% 
+% * 8. Ukuran gambar, gaya garis, dan warna
+% 
+% Tampilan gambar diatur lewat rasio aspect, ketebalan, gaya garis, dan warna kurva.
+% 
+% - aspect(1.5) atur rasio lebar:tinggi; aspect() untuk reset.
+% - style="-", "--", "-." ; thickness=2 untuk garis tebal.
+% - Warna: black, red, green, blue, atau nomor 1:5.
+% 
+% latex: y=e^x\ \text{dan}\ y=1+x\ (\text{garis singgung di } x=0)
+>aspect(1.5);
+>plot2d(["exp(x)","1+x"],-2,2,-1,6,color=[black,red],style=["-","--"],thickness=2):
+ %image% TugasApkom5&6_Ridwan25030630091-009.png
+>aspect();   // kembalikan rasio semula
+% 
+% Penjelasan: Garis y = 1 + x menyinggung y = e^x di (0, 1) dan selalu berada di bawah
+% kurva, sesuai ketaksamaan e^x >= 1 + x.
+% 
+% * 9. Sekumpulan kurva dengan satu perintah
+% 
+% Jika t berupa vektor baris dan k vektor kolom, maka t^k adalah matriks. Setiap baris
+% matriks digambar sebagai satu kurva.
+% 
+% - k=(1:5)' membuat vektor kolom (tanda petik = transpos).
+% - plot2d(x,y) dengan y matriks menggambar semua baris.
+% - color=1:5 memberi warna berbeda tiap kurva.
+% 
+% latex: y=x^n,\quad n=1,2,3,4,5,\ x\in[0,1]
+>t=linspace(0,1,200); k=(1:5)'; plot2d(t,t^k,color=1:5):
+ %image% TugasApkom5&6_Ridwan25030630091-010.png
+% 
+% Penjelasan: Semua kurva melalui (0,0) dan (1,1). Semakin besar n, kurva semakin dekat ke
+% sumbu x pada 0 < x < 1.
+% 
+% * 10. Kurva interaktif
+% 
+% Parameter fungsi bisa diubah langsung saat gambar tampil, sehingga pengaruhnya terlihat
+% seketika.
+% 
+% - >user : ubah parameter dengan tombol +/- atau panah, Enter untuk keluar.
+% - dragvalues : geser nilai parameter dengan mouse.
+% - Hasilnya berupa jendela interaktif (tidak bisa disimpan statik).
+% 
+% latex: f(x)=x^3-ax
+>plot2d({{"x^3-a*x",a=1}},>user,title="Tekan tombol + / - !"):
+ %image% TugasApkom5&6_Ridwan25030630091-011.png
+>function plotf([a,b]) := plot2d("exp(a*x)*cos(2pi*b*x)",0,2pi;a,b);
+>dragvalues("plotf",["a","b"],[-1,2],[[-2,2];[1,10]], ...
+>   heading="Seret nilai:",hcolor=black):
+ %image% TugasApkom5&6_Ridwan25030630091-012.png
+% 
+% Penjelasan: Pada x^3 - ax, turunannya 3x^2 - a. Untuk a > 0 ada dua titik ekstrem di x =
+% +/-sqrt(a/3); untuk a <= 0 kurva selalu naik. Coba ubah a dan amati perubahan bentuknya.
+% 
+% * 11. Kurva parametrik
+% 
+% Kurva parametrik ditentukan oleh x = x(t) dan y = y(t). Buat vektor t dengan linspace,
+% hitung x dan y, lalu plot2d(x,y).
+% 
+% - t=linspace(a,b,n) : nilai parameter.
+% - plot2d(x,y) : x dan y berupa vektor.
+% - r= mengatur jendela agar kurva tidak terpotong.
+% 
+% latex: x=t\cos 2\pi t,\ y=t\sin 2\pi t,\ 0\le t\le 1\quad(\text{spiral})
+% latex: x=\cos 3t,\ y=\sin 4t,\ 0\le t\le 2\pi\quad(\text{Lissajous})
+>t=linspace(0,1,1000); plot2d(t*cos(2*pi*t),t*sin(2*pi*t),r=1):
+ %image% TugasApkom5&6_Ridwan25030630091-013.png
+>t=linspace(0,2pi,1000); plot2d(cos(3*t),sin(4*t),r=1.1):
+ %image% TugasApkom5&6_Ridwan25030630091-014.png
+% 
+% Penjelasan: Pada spiral, jari-jari sama dengan t sehingga membesar secara linear dari 0
+% ke 1 dalam satu putaran. Kurva Lissajous dengan frekuensi 3 : 4 menutup setelah t = 2pi.
+% 
+% * 12. Kurva implisit
+% 
+% Kurva implisit berbentuk F(x,y) = 0. EMT menggambarnya sebagai garis kontur dengan
+% level=0.
+% 
+% - plot2d("F(x,y)",level=0,r=...) menggambar F = 0.
+% - level=[a;b] mengisi daerah a <= F <= b.
+% - Naikkan n (mis. n=100) agar kurva halus.
+% 
+% latex: \dfrac{x^2}{4}+y^2=1\quad(\text{elips})
+% latex: (x^2+y^2-1)^3-x^2y^3=0\quad(\text{kurva hati})
+>plot2d("x^2/4+y^2-1",r=2.5,level=0):
+ %image% TugasApkom5&6_Ridwan25030630091-015.png
+>plot2d("(x^2+y^2-1)^3-x^2*y^3",r=1.3,style="#",color=red,<outline,level=[-2;0],n=100):
+ %image% TugasApkom5&6_Ridwan25030630091-016.png
+% 
+% Penjelasan: Elips memiliki setengah sumbu 2 pada arah x dan 1 pada arah y. Pada kurva
+% hati, level=[-2;0] mengisi daerah dengan F <= 0 sehingga bagian dalam hati berwarna
+% merah.
+% 
+% * 13. Fungsi kompleks
+% 
+% Bilangan kompleks z = x + iy digambar sebagai titik (x, y). Dengan plot2d(f(z)), EMT
+% menampilkan bayangan petak polar oleh fungsi f.
+% 
+% - I adalah satuan imajiner; exp(I*t) = cos t + i sin t.
+% - plot2d(z) menggambar titik (Re z, Im z).
+% - cgrid=[a,b] menggambar jaring bayangan.
+% 
+% latex: w=e^{z},\ |z|\le 1\qquad\text{dan}\qquad w=e^{it}+e^{4it}
+>r=linspace(0,1,50); a=linspace(0,2pi,200)'; z=r*exp(I*a);
+>plot2d(exp(z),cgrid=[40,10]):
+ %image% TugasApkom5&6_Ridwan25030630091-017.png
+>t=linspace(0,2pi,1000); plot2d(exp(I*t)+exp(4*I*t),r=2):
+ %image% TugasApkom5&6_Ridwan25030630091-018.png
+% 
+% Penjelasan: Cakram satuan dipetakan e^z ke daerah di sekitar titik 1 dengan bagian real
+% antara 1/e dan e. Kurva kedua adalah jumlah dua putaran berfrekuensi 1 dan 4, sehingga
+% terbentuk tiga lengkungan dengan jari-jari maksimum 2.
+% 
+% * 14. Daerah yang dibatasi kurva
+% 
+% Daerah di antara dua kurva dapat diarsir dengan membuat poligon tertutup: x maju
+% sepanjang kurva atas dan mundur sepanjang kurva bawah (t|fliplr(t)). Daerah implisit
+% diarsir dengan level.
+% 
+% - t|fliplr(t) : gabungkan vektor t dengan kebalikannya.
+% - >filled,style="/" : isi dengan arsiran.
+% - level=[a;b] : arsir a <= F(x,y) <= b.
+% 
+% latex: \text{Daerah di antara } y=\sin x \text{ dan } y=\cos x,\ \tfrac{\pi}{4}\le x\le\tfrac{5\pi}{4}
+% latex: 1\le x^2+y^2\le 4
+>plot2d("sin(x)",0,2pi); plot2d("cos(x)",>add);
+>t=linspace(pi/4,5pi/4,200);
+>plot2d(t|fliplr(t),sin(t)|fliplr(cos(t)),>filled,>add,style="/"):
+ %image% TugasApkom5&6_Ridwan25030630091-019.png
+>plot2d("x^2+y^2",r=2,level=[1;4],style="/"):
+ %image% TugasApkom5&6_Ridwan25030630091-020.png
+>integrate("sin(x)-cos(x)",pi/4,5*pi/4)   // luas daerah pertama
+2.82842712475
+% 
+% Penjelasan: Luas daerah pertama = integral (sin x - cos x)dx dari pi/4 ke 5pi/4 =
+% 2*sqrt(2) sekitar 2,8284. Daerah kedua berupa cincin antara lingkaran jari-jari 1 dan 2
+% dengan luas pi(4 - 1) = 3pi sekitar 9,42.
+% 
+% * 15. Segi banyak
+% 
+% Segi-n beraturan dapat digambar dari titik-titik (cos(2pi*k/n), sin(2pi*k/n)). Dengan
+% t=linspace(0,2pi,n+1) titik awal dan akhir sama sehingga poligon tertutup.
+% 
+% - linspace(0,2pi,n+1) menghasilkan titik sudut segi-n.
+% - plot2d(cos(t),sin(t),>filled) mengisi poligon.
+% - Sudut dalam: (n-2)*180 derajat/n.
+% 
+% latex: \text{Segi-}n\text{ beraturan},\ n=5,6,8
+>figure(1,3); v=[5,6,8]; ...
+>for k=1:3; figure(k); t=linspace(0,2pi,v[k]+1); ...
+>  plot2d(cos(t),sin(t),r=1.2,>filled,style="/",fillcolor=red); end; ...
+>figure(0):
+ %image% TugasApkom5&6_Ridwan25030630091-021.png
+% 
+% Penjelasan: Sudut dalam masing-masing adalah 108 derajat, 120 derajat, dan 135 derajat.
+% Semakin banyak sisi, bentuknya semakin mendekati lingkaran.
+% 
+% ** Soal 1
+% 
+% Sumber: Dawkins, P. Calculus Cheat Sheet (All), hlm. 3, "Interpretation of the
+% Derivative": garis singgung y = f(a) + f'(a)(x - a)
+% 
+% Tentukan garis singgung kurva di x=2, lalu gambar kurva dan garis singgungnya.
+% latex: f(x)=x^3-3x,\quad y=f(2)+f'(2)(x-2)
+>function f(x) &= x^3-3*x
+
+                                3
+                               x  - 3 x
+
+>&diff(f(x),x)          // f'(x)=3x^2-3
+
+                                  2
+                               3 x  - 3
+
+>f(2)                    // f(2)=2
+2
+>plot2d(&f(x),-2.5,2.5,-8,10,title="f(x)=x^3-3x");
+>plot2d("2+9*(x-2)",>add,style="--",color=red);
+>plot2d([2],[2],>points,>add,color=blue);
+>labelbox(["f","garis singgung"],["-","--"],[black,red]):
+ %image% TugasApkom5&6_Ridwan25030630091-022.png
+% 
+% Penjelasan: f(2) = 8 - 6 = 2 dan f'(2) = 3*4 - 3 = 9, sehingga garis singgungnya y = 2 +
+% 9(x - 2) = 9x - 16. Garis putus-putus menyentuh kurva di titik biru (2, 2).
+% 
+% ** Soal 2
+% 
+% Sumber: Dawkins, P. Calculus Cheat Sheet (All), hlm. 5, "Newton's Method": x(n+1) = x(n)
+% - f(x(n))/f'(x(n))
+% 
+% Hampiri akar x^2-2=0 dengan x0=1 (tiga iterasi).
+% latex: x_{n+1}=x_n-\dfrac{x_n^2-2}{2x_n},\quad x_0=1
+>u=1; us=u;
+>loop 1 to 3; u=u-(u^2-2)/(2*u); us=us|u; end;
+>us                      // 1, 1.5, 1.41667, 1.414216
+[1,  1.5,  1.41667,  1.41422]
+>us[4]-sqrt(2)           // galat setelah 3 iterasi
+2.12390141474e-06
+>plot2d("x^2-2",0.8,2,title="Metode Newton");
+>plot2d(us,us*0,>points,>add,color=red):
+ %image% TugasApkom5&6_Ridwan25030630091-023.png
+% 
+% Penjelasan: Iterasi menghasilkan 1; 1,5; 1,41667; 1,414216, sedangkan sqrt(2) =
+% 1,414214, sehingga galat setelah tiga langkah hanya sekitar 2x10^-6. Titik merah cepat
+% mengumpul ke akar.
+% 
+% ** Soal 3
+% 
+% Sumber: Dawkins, P. Calculus Cheat Sheet (All), hlm. 10, "Area Between Curves": A =
+% integral (f(x) - g(x))dx
+% 
+% Hitung luas daerah antara y=x^2 dan y=2x, lalu gambar daerahnya.
+% latex: A=\int_0^2\left(2x-x^2\right)dx
+>&solve(x^2=2*x,x)            // titik potong
+
+                            [x = 0, x = 2]
+
+>&integrate(2*x-x^2,x,0,2)    // luas eksak
+
+                                  4
+                                  -
+                                  3
+
+>integrate("2*x-x^2",0,2)     // cek numerik
+1.33333333333
+>t=linspace(0,2,200); plot2d(t|fliplr(t),t^2|fliplr(2*t),>filled,style="/");
+>plot2d("x^2",0,2,>add); plot2d("2*x",>add,color=red);
+>labelbox(["y=x^2","y=2x"],["-","-"],[black,red]):
+ %image% TugasApkom5&6_Ridwan25030630091-024.png
+% 
+% Penjelasan: Kedua kurva berpotongan di x = 0 dan x = 2, dan di antaranya garis 2x berada
+% di atas parabola. Luas = [x^2 - x^3/3] dari 0 ke 2 = 4 - 8/3 = 4/3 sekitar 1,333; hasil
+% numeriknya sama.
+% 
+% ** Soal 4
+% 
+% Sumber: Alexander & Koeberlein, Elementary Geometry for College Students, Sec. 2.5
+% "Convex Polygons": Teorema 2.5.1 (diagonal, hlm. 96) dan Contoh 4-5 (hlm. 98)
+% 
+% Contoh 4: sudut dalam segi delapan beraturan. Contoh 5: sudut dalam 144 derajat, berapa sisinya?
+% latex: I=\dfrac{(n-2)\cdot180^\circ}{n},\qquad D=\dfrac{n(n-3)}{2}
+>nn=8; (nn-2)*180/nn           // sudut dalam segi-8
+135
+>&solve((s-2)*180/s=144,s)    // banyak sisi
+
+                               [s = 10]
+
+>10*(10-3)/2                  // diagonal segi-10
+35
+>(10-2)*180                   // jumlah sudut dalam segi-10
+1440
+>figure(1,2); v=[8,10]; ...
+>for k=1:2; figure(k); t=linspace(0,2pi,v[k]+1); ...
+>  plot2d(cos(t),sin(t),r=1.2,>filled,style="/",color=blue); end; ...
+>figure(0):
+ %image% TugasApkom5&6_Ridwan25030630091-025.png
+% 
+% Penjelasan: Untuk n = 8: I = 6*180 derajat/8 = 135 derajat. Dari (n - 2)*180/n = 144
+% diperoleh 36n = 360, jadi n = 10 (dekagon). Segi sepuluh memiliki 10*7/2 = 35 diagonal
+% dan jumlah sudut dalam 8*180 derajat = 1440 derajat.
+% 
+% ** Soal 5
+% 
+% Sumber: Alexander & Koeberlein, Elementary Geometry, Exercises 2.5 no. 1-2 (hlm. 100)
+% dan rumus sudut luar (hlm. 99)
+% 
+% Bandingkan sudut dalam dan sudut luar segi-n beraturan untuk n=3,...,12.
+% latex: I(n)=\dfrac{(n-2)180^\circ}{n},\qquad E(n)=\dfrac{360^\circ}{n}
+>n=3:12; sd=(n-2)*180/n; sd   // sudut dalam
+[60,  90,  108,  120,  128.571,  135,  140,  144,  147.273,  150]
+>se=360/n; se                  // sudut luar
+[120,  90,  72,  60,  51.4286,  45,  40,  36,  32.7273,  30]
+>sd+se                         // selalu 180
+[180,  180,  180,  180,  180,  180,  180,  180,  180,  180]
+>plot2d(n,sd,a=2,b=13,c=0,d=190,title="Sudut dalam dan luar");
+>plot2d(n,sd,>points,>add,style="o");
+>plot2d(n,se,>add,color=blue); plot2d(n,se,>points,>add,style="o",color=blue);
+>plot2d([2,13],[180,180],>add,color=red,style="--");
+>labelbox(["sudut dalam","sudut luar"],["-","-"],[black,blue]):
+ %image% TugasApkom5&6_Ridwan25030630091-026.png
+% 
+% Penjelasan: Sudut dalam bertambah (60 derajat, 90 derajat, ..., 150 derajat) dan
+% mendekati 180 derajat, sedangkan sudut luar berkurang (120 derajat, 90 derajat, ..., 36
+% derajat) dan mendekati 0 derajat. Keduanya selalu berjumlah 180 derajat (I = 180 derajat
+% - 360 derajat/n).
+% 
+% ** Soal 6
+% 
+% Sumber: Grothmann, R. Euler Math Toolbox, Reference (euler_en), bab 3.5 "2D Plots", hlm.
+% 74-75: spiral logaritmik
+% 
+% latex: x=e^{\varphi/10}\cos\varphi,\ y=e^{\varphi/10}\sin\varphi,\ -12\pi\le\varphi\le4\pi
+>phi=linspace(-12pi,4pi,10000); r=exp(phi/10);
+>exp(2*pi/10)                // faktor jari-jari tiap putaran
+1.87445608759
+>max(r)                      // jari-jari terbesar
+3.51358562429
+>plot2d(r*cos(phi),r*sin(phi),r=3.2,grid=0,thickness=2);
+>plot2d([0],[0],>points,>add,color=red);
+>title("r = exp(phi/10)"):
+ %image% TugasApkom5&6_Ridwan25030630091-027.png
+% 
+% Penjelasan: Jari-jari r = e^(phi/10) membesar eksponensial: tiap putaran penuh (2pi)
+% jari-jari dikali e^(2pi/10) sekitar 1,87, jadi putaran luar jauh lebih renggang.
+% Jari-jari terbesar e^(0,4pi) sekitar 3,51 sedikit melewati jendela r = 3,2.
+% 
+% ** Soal 7
+% 
+% Sumber: Notebook EMT4Plot2D (materi Bapak), bagian "Fungsi Implisit" (level=0)
+% 
+% Tentukan dan gambarkan titik potong lingkaran dan garis.
+% latex: x^2+y^2=4,\qquad y=x+1
+>plot2d("x^2+y^2-4",r=3,level=0);
+>plot2d("y-x-1",r=3,level=0,>add,contourcolor=red);
+>&solve([x^2+y^2=4,y=x+1],[x,y])
+
+             - sqrt(7) - 1      1 - sqrt(7)
+       [[x = -------------, y = -----------], 
+                   2                 2
+                                        sqrt(7) - 1      sqrt(7) + 1
+                                   [x = -----------, y = -----------]]
+                                             2                2
+
+>px=(-1+sqrt(7))/2; qx=(-1-sqrt(7))/2; [px,qx]
+[0.822876,  -1.82288]
+>plot2d([px,qx],[px+1,qx+1],>points,>add,color=blue);
+>px^2+(px+1)^2               // cek: harus 4
+4
+>title("lingkaran dan garis"):
+ %image% TugasApkom5&6_Ridwan25030630091-028.png
+> 
+% 
+% Penjelasan: Substitusi y = x + 1 memberi 2x^2 + 2x - 3 = 0, sehingga x = (-1 +/-
+% sqrt(7))/2. Titik potongnya sekitar (0,823; 1,823) dan (-1,823; -0,823); pengecekan x^2
+% + y^2 menghasilkan 4.
+% 
+% * Kesimpulan
+% 
+% plot2d() menggambar ekspresi, fungsi numerik (:=), dan fungsi simbolik (&=). Banyak
+% kurva digambar dengan vektor ekspresi, >add, figure(), atau matriks. Kurva khusus:
+% parametrik plot2d(x,y), implisit level=..., kompleks plot2d(z). Daerah dan poligon:
+% >filled, t|fliplr(t), level=[a;b].

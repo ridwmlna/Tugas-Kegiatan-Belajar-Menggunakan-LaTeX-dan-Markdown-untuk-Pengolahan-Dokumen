@@ -1,0 +1,216 @@
+﻿% * Menggambar Plot 3D dengan EMT
+% 
+% Nama : Ridwan Maulana
+%% NIM  : 25030630091
+%% kelas: Matematika F
+% 
+% Pada tugas ini, saya mencoba beberapa bentuk grafik 3D menggunakan
+% contoh fungsi dan data yang tersedia di EMT. Saya juga mengubah
+% beberapa parameter untuk melihat pengaruhnya terhadap bentuk dan
+% tampilan grafik.
+% 
+% Cara Penggunaan Notebook:
+%% Tekan ENTER pada setiap baris perintah yang diawali tanda >, kemudian
+% amati hasilnya. Jika diper-lukan, ubah angka atau parameter untuk
+% melihat perbedaannya. Tanda ... menunjukkan bahwa perintah berlanjut
+% ke baris berikutnya.
+% 
+% * Pendahuluan
+% 
+% Grafik tiga dimensi (3D) digunakan untuk memvisualisasikan fungsi dua
+% variabel dalam bentuk per-mukaan di ruang tiga dimensi. Dalam Euler
+% Math Toolbox (EMT), grafik tersebut dapat dibuat meng-gunakan perintah
+% plot3d.
+%% Euler menggunakan algoritma pengurutan untuk menampilkan permukaan dan
+% menyembunyikan bagian yang berada di belakang. Secara umum, Euler
+% menggunakan proyeksi sentral dengan titik pandang bawaan dari kuadran
+% positif sumbu x dan y menuju titik asal \((0,0,0)\). Sudut dan
+% ketinggian pandangan dapat diatur sesuai kebutuhan.
+% 
+% EMT menyediakan beberapa jenis visualisasi 3D, yaitu:
+%% -Permukaan dengan bayangan (shading) dan garis kontur (level lines).
+%% -Awan titik (clouds of points).
+%% -Kurva parametrik (parametric curves).
+%% -Permukaan implisit (implicit surfaces).
+% 
+% ** Dasar Grafik Fungsi Dua Variabel
+% 
+% Fungsi dua variabel dinyatakan dalam bentuk:
+%%  latex: z=f(x,y)
+% 
+% Artinya, nilai \(z\) bergantung pada nilai \(x\) dan \(y\). Jika
+% beberapa pasangan nilai \(x\) dan \(y\) dimasukkan ke dalam fungsi,
+% akan diperoleh titik-titik yang membentuk permukaan 3D.
+% 
+% Pada EMT, permukaan tersebut dapat digambar menggunakan perintah
+% plot3d. Rentang grafik dapat diatur menggunakan parameter r atau batas
+% nilai \(x\) dan \(y\).
+% 
+% * 1. Fungsi Dua Variabel: Ekspresi Langsung
+% Fungsi $z=f(x,y)$ memetakan titik $(x,y)$ ke satu nilai $z$. Grafiknya
+% berupa permukaan di ruang 3D. Contoh permukaan baku: bidang
+% $z=ax+by+c$, paraboloida $z=x^2+y^2$, pelana $z=x^2-y^2$, kerucut
+% $z=\sqrt{x^2+y^2}$, bola $x^2+y^2+z^2=r^2$. Parameter penting: a,b
+% (rentang x), c,d (rentang y), r (kotak simetris), n (jumlah
+% subinterval), grid (garis grid).
+>plot3d("x^2+y^2"):
+>aspect(1.5); plot3d("x^2+sin(y)",-5,5,0,6*pi):
+% Hasil: talang bergelombang. Parabola pada arah x, gelombang sinus pada arah y.
+>plot3d("x^2+x*sin(y)",-5,5,0,6*pi,n=60,grid=10):
+% Amplitudo gelombang membesar menjauhi x=0 karena dikali x.
+% 
+% Soal: buat talang tersebut melengkung seperti papan peluncur kolam renang.
+% Idea: u = lebar talang, v = panjang talang. Garis tengah diganti busur lingkaran jari-jari R,
+% sudut th=v/R, titik berjarak u berada di jari-jari R+u:
+% $X=(R+u)\cos\theta,\ Y=(R+u)\sin\theta,\ Z=u^2+\sin v$. Untuk turun/naik: $Z=u^2+\sin v-k\theta$.
+>u=linspace(-1.5,1.5,30); v=linspace(0,12*pi,400)'; R=6; k=0.8; th=v/R; ...
+> X=(R+u)*cos(th); Y=(R+u)*sin(th); Z=u^2+sin(v)-k*th; ...
+> plot3d(X,Y,Z,>hue,>spectral,<frame,angle=-30°,height=45°,zoom=3):
+% Hasil: talang spiral menurun satu putaran. Ganti k=-0.8 agar naik, k=0 agar mendatar.
+% 
+% * 2. Rumus Disimpan dalam Variabel Ekspresi
+% Rumus berupa string disimpan di variabel agar bisa dipakai berulang.
+>ekspr="sin(x)*cos(y)"; plot3d(ekspr,-pi,pi,-pi,pi,>hue,>spectral,>contour):
+% Hasil: permukaan "kotak telur", z antara -1 dan 1.
+>ekspr="x^2-y^2"; plot3d(ekspr,r=2,>hue,>spectral):
+% 
+% * 3. Fungsi Numerik
+% Didefinisikan dengan kata kunci function. Fungsi satu baris memakai ":=".
+>function g(x,y) := exp(-(x^2+y^2))*cos(2*x); plot3d("g(x,y)",r=2,n=60,>hue,>contour):
+% Hasil: lonceng Gauss dikali cos(2x), muncul punggung dan lembah sejajar sumbu y.
+% 
+% * 4. Fungsi Simbolik
+% Operator &= menyimpan ekspresi simbolik (Maxima), sehingga bisa diturunkan.
+>function h(x,y) &= x^2*y-y^3/3; &h(x,y), &diff(h(x,y),x), &diff(h(x,y),y)
+>plot3d("h(x,y)",r=2,>hue,>spectral,>contour):
+% Hasil: pelana monyet. Turunan parsial $h_x=2xy$ dan $h_y=x^2-y^2$ bernilai nol di (0,0), titik pelana datar.
+% 
+% * 5. Data x, y, z
+% plot3d menerima matriks x, y, z: pemetaan $\gamma(t,s)=(x(t,s),y(t,s),z(t,s))$.
+% t vektor baris, s vektor kolom (diberi tanda petik ') sehingga terbentuk grid persegi.
+>t=-1:0.1:1; s=(-1:0.1:1)'; plot3d(t,s,t*s,grid=10):
+% Hasil: permukaan z=x*y (pelana).
+>t=linspace(0,2pi,180); s=linspace(-pi/2,pi/2,90)'; ...
+> plot3d(cos(s)*cos(t),cos(s)*sin(t),sin(s),>hue,color=blue,<frame,grid=[10,20],scale=1.4,height=50°):
+% Hasil: bola. t = garis bujur, s = garis lintang. (Rumus bola: cos t cos s, sin t cos s, sin s.)
+% Bola terdistorsi dengan faktor $d=1+0.2(\cos 4t+\cos 8s)$:
+>t=linspace(0,2pi,320); s=linspace(-pi/2,pi/2,160)'; d=1+0.2*(cos(4*t)+cos(8*s)); ...
+> plot3d(cos(t)*cos(s)*d,sin(t)*cos(s)*d,sin(s)*d,hue=1,light=[1,0,1],frame=0,zoom=5):
+% 
+% * 6. Interaktif dan Animasi
+% Dengan >user: tombol panah memutar, +/- zoom, spasi reset, Enter selesai.
+>plot3d("exp(-x^2+y^2)",>user,title="Putar dengan tombol panah (Enter untuk selesai)"):
+% Animasi: rotate() menggambar ulang plot dari berbagai sudut pandang.
+>function testplot () := plot3d("x^2+y^3"); rotate("testplot"); testplot():
+% 
+% * 7. Fungsi Parametrik 3D
+% Permukaan $r(u,v)=(x(u,v),y(u,v),z(u,v))$, kurva ruang $r(t)=(x(t),y(t),z(t))$.
+% Kurva ruang (heliks), memakai >wire:
+>t=linspace(0,8pi,500); plot3d(sin(t),cos(t),t/10,>wire,zoom=3):
+% Torus (jari-jari besar 3, kecil 1):
+>u=linspace(0,2*pi,80); v=linspace(0,2*pi,40)'; ...
+> plot3d((3+cos(v))*cos(u),(3+cos(v))*sin(u),sin(v),>hue,color=orange,<frame,height=50°,zoom=4):
+% Pita Moebius (permukaan satu sisi):
+>u=linspace(-1,1,10); v=linspace(0,2*pi,50)'; ...
+> plot3d((3+u*cos(v/2))*cos(v),(3+u*cos(v/2))*sin(v),u*sin(v/2),<frame,>wire,scale=2.3):
+% 
+% * 8. Fungsi Implisit 3D
+% Menampilkan himpunan $f(x,y,z)=0$ lewat irisan. implicit=1 (bidang y-z), 2 (x-z), 4 (x-y); boleh dijumlah.
+>plot3d("x^2/4+y^2+z^2-1",>implicit,r=2,zoom=2.5):
+% Hasil: elipsoida semi-sumbu 2,1,1 (tampak sebagai irisan-irisan).
+>plot3d("x^2+y^2-z^2-1",>implicit,r=2,zoom=2.5):
+% Hasil: hiperboloida satu daun.
+% 
+% * 9. Titik pada Ruang 3D
+% Butuh tiga vektor koordinat, dengan points=true.
+>n=500; plot3d(normal(1,n),normal(1,n),normal(1,n),points=true,style="."):
+% Sebaran normal: padat di pusat. Bandingkan dengan sebaran seragam:
+>n=300; plot3d(random(1,n),random(1,n),random(1,n),points=true,style="."):
+% 
+% * 10. Tampilan, Warna, dan Sudut Pandang
+% distance (jarak), zoom, angle (sudut terhadap sumbu y negatif), height (tinggi pandang), center (pusat).
+>view
+% Hasilnya [jarak, zoom, angle, height]. Contoh mengubahnya:
+>plot3d("x^4+y^2",a=0,b=1,c=-1,d=1,angle=-20°,height=20°,center=[0.4,0,0],zoom=5):
+% Plot polar, skala fungsi, bingkai, dan transparansi:
+>plot3d("1/(x^2+y^2+1)",r=5,>polar,fscale=2,>hue,n=100,zoom=4,>contour,color=blue):
+>plot3d("x^2+y^2",>transparent,grid=10,wirecolor=red):
+>plot3d("x^2/(x^2+y^2+1)",color=0,hue=true,grid=10):
+% color=0 memberi efek pelangi. Cahaya diatur dengan light=[...] dan amb (0 sampai 1).
+% 
+% * 11. Kontur dan Bidang Kontur
+% >hue = bayangan, >contour = garis kontur, level=... = nilai kontur, >spectral = warna spektral,
+% >cp = bidang kontur di bawah permukaan. Kontur rapat = curam, renggang = landai.
+>plot3d("exp(-x^2-y^2)",r=2,n=100,level="thin",>contour,>spectral,fscale=1,scale=1.1,angle=45°,height=20°):
+>plot3d("x^2-y^2",0,5,0,5,level=-1:0.1:1,color=redgreen):
+>plot3d("x^2+y^4",>cp,cpcolor=green,cpdelta=0.2):
+% Himpunan titik $x^y=y^x$ digambar sebagai satu garis kontur level=0:
+>plot3d("x^y-y^x",level=0,a=0,b=6,c=0,d=6,contourcolor=red,n=100):
+% Hasil: garis y=x dan kurva lain yang melewati (2,4) dan (4,2).
+% 
+% * 12. Anaglif (butuh kacamata merah/cyan)
+>plot3d("x^2-y^2",>anaglyph,>hue,r=2):
+>plot3d("x^2+y^3",>anaglyph,>contour,angle=30°):
+% Tanpa kacamata, tepi gambar tampak berwarna merah dan cyan.
+% 
+% * 13. Diagram Batang 3D
+% x baris n+1 elemen, y kolom n+1 elemen, z matriks nxn. (x|1.1) menambah elemen di kanan, (y_1.1) di bawah.
+>x=-1:0.2:1; y=x'; z=x^2+y^2; xa=(x|1.2)-0.1; ya=(y_1.2)-0.1; plot3d(xa,ya,z,bar=true):
+% Hasil: batang tinggi x^2+y^2, tertinggi di sudut, terendah di pusat.
+% Batang dari data frekuensi (simulasi 5 kali 100 lemparan dadu):
+>Z=intrandom(5,100,6); v=zeros(5,6); loop 1 to 5; v[#]=getmultiplicities(1:6,Z[#]); end; ...
+> columnsplot3d(v',scols=1:5,ccols=[1:5]):
+% 
+% * 14. Permukaan Benda Putar
+% Kurva $y=f(x)$ diputar mengelilingi sumbu x: $(x,f(x)\cos\theta,f(x)\sin\theta)$.
+% Volume (cakram): $V=\pi\int_a^b [f(x)]^2dx$. rotate=1 (sumbu x), rotate=2 (sumbu z).
+>plot3d("x^2+1",a=-1,b=1,rotate=1,grid=5):
+>plot3d("x^2+1",a=-1,b=1,rotate=2,grid=5):
+>plot3d("sqrt(25-x^2)",a=0,b=5,rotate=1):
+% Hasil: belahan bola jari-jari 5.
+% Hati diputar mengelilingi sumbu z (persamaan implisit pada koordinat silinder):
+>function fh(x,y,z) ...
+$ r=x^2+y^2;
+$ return (r+z^2-1)^3-r*z^3;
+$ endfunction
+>plot3d("fh(x,y,z)",xmin=0,xmax=1.2,ymin=-1.2,ymax=1.2,zmin=-1.2,zmax=1.4,>implicit,angle=-30°,zoom=2.5,n=[10,60,60]):
+% 
+% * 15. Povray (hasil lebih halus; butuh Povray terpasang)
+% Unduh Povray dari povray.org, lalu atur path-nya. Sesuaikan lokasi instalasi Anda.
+>load povray;
+>defaultpovray="C:\Program Files\POV-Ray\v3.7\bin\pvengine.exe";
+>pov3d("x^2+y^2",zoom=3);
+>pov3d("x^2+y^3",axiscolor=red,angle=-45°,>anaglyph,look=povlook(cyan,0.2),level=-1:0.5:1,zoom=3.8);
+% Objek dasar: tiga silinder berpotongan (benda Steinmetz).
+>povstart(zoom=4); ...
+> c1=povcylinder(-povx,povx,1,povlook(red)); c2=povcylinder(-povy,povy,1,povlook(yellow)); ...
+> c3=povcylinder(-povz,povz,1,povlook(blue)); writeln(povintersection([c1,c2,c3])); povend();
+% Jika muncul galat Povray, jalankan povend(<exit) agar jendela Povray tetap terbuka dan galatnya terlihat.
+% 
+% * 16. Soal Latihan
+% Soal 1 (Kalkulus, grafik fungsi dua variabel): Gambarkan $z=4-x^2-y^2$ untuk $z\ge 0$.
+>plot3d("max(4-x^2-y^2,0)",r=2,>hue,>spectral,>contour):
+% Penjelasan: paraboloida terbuka ke bawah, puncak (0,0,4), kontur berupa lingkaran $x^2+y^2=4-k$.
+% 
+% Soal 2 (Kalkulus, benda putar - Calculus Cheat Sheet, Volumes of Revolution):
+% Daerah di bawah $y=\sqrt{x}$, $0\le x\le 4$ diputar mengelilingi sumbu x. Gambar dan hitung volumenya.
+>plot3d("sqrt(x)",a=0,b=4,rotate=1,grid=10):
+>pi*integrate("x",0,4), 8*pi
+% Penjelasan: $V=\pi\int_0^4 x\,dx=8\pi\approx 25{,}13$. Kedua hasil harus sama.
+% 
+% Soal 3 (Geometri, bola): Gambar bola $x^2+y^2+z^2=9$ dan hitung volumenya.
+>t=linspace(0,2pi,100); s=linspace(-pi/2,pi/2,50)'; ...
+> plot3d(3*cos(s)*cos(t),3*cos(s)*sin(t),3*sin(s),>hue,color=red,<frame):
+>4/3*pi*3^3
+% Penjelasan: $V=\frac{4}{3}\pi r^3=36\pi\approx 113{,}10$.
+% 
+% Soal 4 (Kalkulus, silinder): Gambar $x^2+y^2=4$, $0\le z\le 3$ sebagai permukaan parametrik.
+>u=linspace(0,2*pi,60); v=linspace(0,3,10)'; plot3d(2*cos(u)+0*v,2*sin(u)+0*v,v+0*u,>hue,color=orange,<frame):
+% Penjelasan: $x=2\cos u,\ y=2\sin u,\ z=v$. Tambahan 0*v dan 0*u memaksa ukuran matriks sama.
+% 
+% Soal 5 (Kalkulus, ekstrem): Gambar $z=x\,e^{-x^2-y^2}$ dan tentukan di mana kontur $z=0$.
+>plot3d("x*exp(-x^2-y^2)",r=2,n=80,>hue,>spectral,>contour,level=0,contourcolor=black):
+% Penjelasan: kontur $z=0$ adalah garis $x=0$ (sumbu y). Ada satu puncak di $x>0$ dan satu lembah di $x<0$.
+% 
+% Latihan mandiri: (a) ubah k pada talang spiral, (b) putar $y=1+0.3\sin(3x)$ pada $0\le x\le 2\pi$ mengelilingi sumbu x,
+% (c) gambar kerucut $z=\sqrt{x^2+y^2}$ dengan >contour.
